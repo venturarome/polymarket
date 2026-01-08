@@ -7,12 +7,12 @@ namespace Danielgnh\PolymarketPhp\Auth;
 /**
  * Represents L2 API credentials returned from CLOB.
  */
-readonly class ApiCredentials
+class ApiCredentials
 {
     public function __construct(
-        public string $apiKey,
-        public string $apiSecret,
-        public string $passphrase
+        public readonly string $apiKey,
+        public readonly string $apiSecret,
+        public readonly string $passphrase
     ) {}
 
     /**

@@ -18,13 +18,13 @@ use GuzzleHttp\Exception\GuzzleException;
  * - Store API credentials securely
  * - Provide header generation for requests
  */
-readonly class ClobAuthenticator
+class ClobAuthenticator
 {
     public function __construct(
-        private Eip712Signer $signer,
-        private string $clobBaseUrl,
-        private int $chainId = 137,
-        private ?ApiCredentials $credentials = null
+        private readonly Eip712Signer $signer,
+        private readonly string $clobBaseUrl,
+        private readonly int $chainId = 137,
+        private readonly ?ApiCredentials $credentials = null
     ) {}
 
     /**
@@ -112,7 +112,7 @@ readonly class ClobAuthenticator
         $signature = $this->signer->signClobAuth($timestamp, $nonce);
 
         return [
-            'POLY_ADDRESS' => strtolower($this->signer->address),
+            'POLY_ADDRESS' => strtolower($this->signer->getAddress()),
             'POLY_SIGNATURE' => $signature,
             'POLY_TIMESTAMP' => (string) $timestamp,
             'POLY_NONCE' => (string) $nonce,
@@ -147,7 +147,7 @@ readonly class ClobAuthenticator
         );
 
         return [
-            'POLY_ADDRESS' => $this->signer->address,
+            'POLY_ADDRESS' => $this->signer->getAddress(),
             'POLY_SIGNATURE' => $signature,
             'POLY_TIMESTAMP' => (string) $timestamp,
             'POLY_API_KEY' => $this->credentials->apiKey,
@@ -168,7 +168,7 @@ readonly class ClobAuthenticator
      */
     public function getAddress(): string
     {
-        return $this->signer->address;
+        return $this->signer->getAddress();
     }
 
     /**

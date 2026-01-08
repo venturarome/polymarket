@@ -23,10 +23,9 @@ class Eip712Signer
 
     private Address $ethAddress;
 
-    public string $address {
-        get {
-            return '0x' . $this->ethAddress->get();
-        }
+    public function getAddress(): string
+    {
+        return '0x' . $this->ethAddress->get();
     }
 
     private int $chainId;
@@ -60,7 +59,7 @@ class Eip712Signer
     {
         try {
             $message = [
-                'address' => strtolower($this->address),
+                'address' => strtolower($this->getAddress()),
                 'timestamp' => (string) $timestamp,
                 'nonce' => $nonce,
                 'message' => 'This message attests that I control the given wallet',
