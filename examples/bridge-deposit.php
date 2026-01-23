@@ -23,7 +23,6 @@ use Danielgnh\PolymarketPhp\Client;
  * for trading on Polymarket.
  */
 
-// Initialize client
 $client = new Client();
 
 echo "Bridge API Examples\n";
@@ -59,6 +58,9 @@ try {
     echo "2. Generating deposit addresses...\n";
 
     // Your Polygon destination address (where USDC.e will be sent)
+    // WARNING: This is a placeholder address (the zero address) and MUST be replaced
+    // with your actual Polygon wallet address before using this script with real funds.
+    // Depositing to the zero address will result in permanent loss of funds.
     $destinationAddress = '0x0000000000000000000000000000000000000000';
     $amount = '100'; // Amount to deposit in USD
 
@@ -86,7 +88,6 @@ try {
         echo "  Note: Low gas fees\n\n";
     }
 
-    // Bitcoin
     if (isset($depositAddresses['bitcoin'])) {
         echo "Bitcoin:\n";
         echo "  Address: {$depositAddresses['bitcoin']}\n";
@@ -99,42 +100,3 @@ try {
 } catch (Exception $e) {
     echo "Error generating deposit addresses: {$e->getMessage()}\n\n";
 }
-
-// 3. Example: Deposit workflow explanation
-echo "3. Deposit Workflow:\n";
-echo "-------------------\n";
-echo "1. User selects source chain and asset (e.g., ETH on Arbitrum)\n";
-echo "2. Generate deposit address using Bridge API\n";
-echo "3. User sends asset to the provided address\n";
-echo "4. Bridge service detects the deposit\n";
-echo "5. Asset is bridged and converted to USDC.e\n";
-echo "6. USDC.e is sent to destination address on Polygon\n";
-echo "7. User can now trade on Polymarket\n\n";
-
-// 4. Example: Multi-chain support
-echo "4. Supported Blockchain Networks:\n";
-echo "---------------------------------\n";
-echo "EVM Compatible:\n";
-echo "  • Ethereum Mainnet\n";
-echo "  • Arbitrum One\n";
-echo "  • Base\n";
-echo "  • Optimism\n";
-echo "  • Polygon (direct)\n";
-echo "  • BNB Chain\n";
-echo "  • Avalanche C-Chain\n\n";
-
-echo "Other Chains:\n";
-echo "  • Solana (SVM)\n";
-echo "  • Bitcoin\n\n";
-
-// 5. Important notes
-echo "5. Important Notes:\n";
-echo "-------------------\n";
-echo "• Minimum deposit amounts apply (varies by asset)\n";
-echo "• Bridge fees may apply (typically 0.1-0.5%)\n";
-echo "• Confirmation times vary by chain:\n";
-echo "  - EVM chains: ~1-5 minutes\n";
-echo "  - Solana: ~30 seconds\n";
-echo "  - Bitcoin: ~30-60 minutes\n";
-echo "• Always double-check the destination address\n";
-echo "• Test with small amounts first\n";
