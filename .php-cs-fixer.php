@@ -4,7 +4,7 @@ $finder = PhpCsFixer\Finder::create()
 	->in(__DIR__ . '/src')
 	->in(__DIR__ . '/tests');
 
-return new PhpCsFixer\Config()
+return (new PhpCsFixer\Config())
 	->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
 	->setUnsupportedPhpVersionAllowed(true)
 	->setRules([
