@@ -41,6 +41,11 @@ class GuzzleHttpClient implements HttpClientInterface
         $this->authenticator = $authenticator;
     }
 
+    public function getGuzzleClient(): GuzzleClient
+    {
+        return $this->client;
+    }
+
     /**
      * @throws PolymarketException
      */

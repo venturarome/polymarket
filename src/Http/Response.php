@@ -30,7 +30,7 @@ class Response
             $decoded = json_decode($this->body, true, 512, JSON_THROW_ON_ERROR);
             if (!is_array($decoded)) {
                 throw new JsonParseException(
-                    message: 'JSON response is not an array',
+                    message: 'JSON response is not an array. Response body: ' . substr($this->body, 0, 200),
                     code: $this->statusCode
                 );
             }

@@ -5,18 +5,31 @@ declare(strict_types=1);
 namespace Danielgnh\PolymarketPhp\Http;
 
 use Danielgnh\PolymarketPhp\Exceptions\PolymarketException;
+use GuzzleHttp\Promise\FulfilledPromise;
+use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectedPromise;
 
 /**
  * Fake HTTP client for testing purposes.
  * Allows setting up predefined responses without making real HTTP calls.
  */
-class FakeGuzzleHttpClient implements HttpClientInterface
+class FakeGuzzleHttpClient implements HttpClientInterface, AsyncClientInterface
 {
     /** @var array<string, Response> */
     private array $responses = [];
 
     /** @var array<string, array{method: string, path: string, data: array<int|string, mixed>}> */
     private array $requests = [];
+
+    /** @var array<string, PolymarketException> */
+    private array $exceptions = [];
+
+    private readonly RequestPool $pool;
+
+    public function __construct()
+    {
+        $this->pool = new RequestPool();
+    }
 
     public function get(string $path, array $query = []): Response
     {
@@ -94,6 +107,59 @@ class FakeGuzzleHttpClient implements HttpClientInterface
         $key = $this->makeKey($method, $path);
 
         return isset($this->requests[$key]);
+    }
+
+    public function addExceptionResponse(string $method, string $path, PolymarketException $exception): void
+    {
+        $key = $this->makeKey($method, $path);
+        $this->exceptions[$key] = $exception;
+    }
+
+    /**
+     * @param array<string, mixed> $query
+     */
+    public function getAsync(string $path, array $query = []): PromiseInterface
+    {
+        return $this->requestAsync('GET', $path, $query);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function postAsync(string $path, array $data = []): PromiseInterface
+    {
+        return $this->requestAsync('POST', $path, $data);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function deleteAsync(string $path, array $data = []): PromiseInterface
+    {
+        return $this->requestAsync('DELETE', $path, $data);
+    }
+
+    /**
+     * @param array<string, PromiseInterface> $promises
+     */
+    public function pool(array $promises, ?int $concurrency = null): BatchResult
+    {
+        return $this->pool->batch($promises, $concurrency);
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     */
+    private function requestAsync(string $method, string $path, array $data): PromiseInterface
+    {
+        $this->recordRequest($method, $path, $data);
+        $key = $this->makeKey($method, $path);
+
+        if (isset($this->exceptions[$key])) {
+            return new RejectedPromise($this->exceptions[$key]);
+        }
+
+        return new FulfilledPromise($this->getResponse($method, $path));
     }
 
     /**
