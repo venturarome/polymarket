@@ -106,8 +106,6 @@ class Client
 
     /**
      * Get Bridge API client for cross-chain deposits.
-     *
-     * @return Bridge
      */
     public function bridge(): Bridge
     {

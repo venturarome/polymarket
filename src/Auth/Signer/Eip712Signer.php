@@ -134,7 +134,6 @@ class Eip712Signer
      * @param array<string, array<array{name: string, type: string}>>                $types
      * @param array{address: string, timestamp: string, nonce: int, message: string} $message
      *
-     * @return string
      * @throws Exception
      */
     private function hashTypedData(array $domain, array $types, array $message): string
@@ -161,11 +160,9 @@ class Eip712Signer
     /**
      * Hash a struct according to EIP-712.
      *
-     * @param string                                   $typeName
      * @param array<array{name: string, type: string}> $types
      * @param array<string, mixed>                     $data
      *
-     * @return string
      *
      * @throws Exception
      */
@@ -239,7 +236,6 @@ class Eip712Signer
 
     /**
      * @param  string  $hash  Hash to sign (with 0x prefix)
-     * @return string
      */
     private function signHash(string $hash): string
     {

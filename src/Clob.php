@@ -46,11 +46,6 @@ class Clob
 {
     private readonly HttpClientInterface $httpClient;
 
-    /**
-     * @param Config                   $config
-     * @param HttpClientInterface|null $httpClient
-     * @param ClobAuthenticator|null   $authenticator
-     */
     public function __construct(
         private readonly Config $config,
         ?HttpClientInterface $httpClient = null,

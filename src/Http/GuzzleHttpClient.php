@@ -178,9 +178,7 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     * @param GuzzleException $e
      *
-     * @return never
      * @throws ApiException
      * @throws AuthenticationException
      * @throws NotFoundException
