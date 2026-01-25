@@ -14,16 +14,15 @@ return RectorConfig::configure()
         __DIR__ . '/tests',
     ])
     ->withPhpSets(php81: true)
-    ->withTypeCoverageLevel(20)
-    ->withDeadCodeLevel(20)
-    ->withCodeQualityLevel(20)
+    ->withTypeCoverageLevel(30)
+    ->withDeadCodeLevel(30)
+    ->withCodeQualityLevel(30)
     ->withImportNames(
         importShortClasses: false,
         removeUnusedImports: true,
     )
     ->withRules([
         DeclareStrictTypesRector::class,
-        AddVoidReturnTypeWhereNoReturnRector::class,
     ])
     ->withParallel(
         timeoutSeconds: 120,
