@@ -70,7 +70,7 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     public function delete(string $path, array $data = []): Response
     {
-        $options = empty($data) ? [] : ['json' => $data];
+        $options = $data === [] ? [] : ['json' => $data];
 
         return $this->request('DELETE', $path, $options);
     }
@@ -178,7 +178,6 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     *
      * @throws ApiException
      * @throws AuthenticationException
      * @throws NotFoundException

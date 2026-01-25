@@ -134,7 +134,7 @@ class ClobAuthenticator
         ?string $body = null,
         ?int $timestamp = null
     ): array {
-        if ($this->credentials === null) {
+        if (!$this->credentials instanceof ApiCredentials) {
             throw ClobAuthenticationException::notSetup();
         }
 
@@ -162,7 +162,7 @@ class ClobAuthenticator
      */
     public function hasCredentials(): bool
     {
-        return $this->credentials !== null;
+        return $this->credentials instanceof ApiCredentials;
     }
 
     /**
