@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Rewards::getCurrentRewards()', function () {
-    it('fetches active reward markets', function () {
+describe('Rewards::getCurrentRewards()', function (): void {
+    it('fetches active reward markets', function (): void {
         $rewardsData = [
             ['market_id' => 'market_1', 'reward_rate' => '0.05'],
             ['market_id' => 'market_2', 'reward_rate' => '0.03'],
@@ -27,8 +27,8 @@ describe('Rewards::getCurrentRewards()', function () {
     });
 });
 
-describe('Rewards::getForMarket()', function () {
-    it('fetches rewards for specific market', function () {
+describe('Rewards::getForMarket()', function (): void {
+    it('fetches rewards for specific market', function (): void {
         $marketRewardsData = [
             ['condition_id' => 'market_123', 'reward_rate' => '0.04', 'total_rewards' => '1000.00'],
         ];
@@ -42,8 +42,8 @@ describe('Rewards::getForMarket()', function () {
     });
 });
 
-describe('Rewards::getEarningsForDay()', function () {
-    it('fetches daily earnings breakdown', function () {
+describe('Rewards::getEarningsForDay()', function (): void {
+    it('fetches daily earnings breakdown', function (): void {
         $earningsData = [
             ['market_id' => 'market_1', 'earnings' => '10.50'],
             ['market_id' => 'market_2', 'earnings' => '5.25'],
@@ -58,8 +58,8 @@ describe('Rewards::getEarningsForDay()', function () {
     });
 });
 
-describe('Rewards::getTotalEarningsForDay()', function () {
-    it('fetches total daily earnings', function () {
+describe('Rewards::getTotalEarningsForDay()', function (): void {
+    it('fetches total daily earnings', function (): void {
         $totalEarningsData = [
             ['date' => '2025-01-15', 'total_earnings' => '15.75'],
         ];
@@ -73,8 +73,8 @@ describe('Rewards::getTotalEarningsForDay()', function () {
     });
 });
 
-describe('Rewards::getUserEarningsAndMarketsConfig()', function () {
-    it('fetches earnings with market configuration', function () {
+describe('Rewards::getUserEarningsAndMarketsConfig()', function (): void {
+    it('fetches earnings with market configuration', function (): void {
         $configData = [
             [
                 'market_id' => 'market_1',
@@ -92,8 +92,8 @@ describe('Rewards::getUserEarningsAndMarketsConfig()', function () {
     });
 });
 
-describe('Rewards::getRewardPercentages()', function () {
-    it('fetches reward percentage rates', function () {
+describe('Rewards::getRewardPercentages()', function (): void {
+    it('fetches reward percentage rates', function (): void {
         $percentagesData = [
             'base_rate' => '0.02',
             'bonus_rate' => '0.01',

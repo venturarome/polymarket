@@ -33,12 +33,8 @@ use Danielgnh\PolymarketPhp\Resources\Gamma\Tags;
  */
 class Gamma
 {
-    private HttpClientInterface $httpClient;
+    private readonly HttpClientInterface $httpClient;
 
-    /**
-     * @param Config                   $config
-     * @param HttpClientInterface|null $httpClient
-     */
     public function __construct(
         private readonly Config $config,
         ?HttpClientInterface $httpClient = null

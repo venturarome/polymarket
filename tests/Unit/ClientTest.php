@@ -10,19 +10,19 @@ use Danielgnh\PolymarketPhp\Resources\Bridge\Deposits;
 use Danielgnh\PolymarketPhp\Resources\Clob\Orders;
 use Danielgnh\PolymarketPhp\Resources\Gamma\Markets;
 
-it('creates client with default configuration', function () {
+it('creates client with default configuration', function (): void {
     $client = new Client();
 
     expect($client)->toBeInstanceOf(Client::class);
 });
 
-it('creates client with api key', function () {
+it('creates client with api key', function (): void {
     $client = new Client('test-api-key');
 
     expect($client)->toBeInstanceOf(Client::class);
 });
 
-it('creates client with custom options', function () {
+it('creates client with custom options', function (): void {
     $client = new Client('test-key', [
         'gamma_base_url' => 'https://custom-gamma.api.com',
         'clob_base_url' => 'https://custom-clob.api.com',
@@ -32,21 +32,21 @@ it('creates client with custom options', function () {
     expect($client)->toBeInstanceOf(Client::class);
 });
 
-it('provides gamma client', function () {
+it('provides gamma client', function (): void {
     $client = new Client();
     $gamma = $client->gamma();
 
     expect($gamma)->toBeInstanceOf(Gamma::class);
 });
 
-it('provides clob client', function () {
+it('provides clob client', function (): void {
     $client = new Client();
     $clob = $client->clob();
 
     expect($clob)->toBeInstanceOf(Clob::class);
 });
 
-it('caches gamma client instance', function () {
+it('caches gamma client instance', function (): void {
     $client = new Client();
 
     $gamma1 = $client->gamma();
@@ -56,7 +56,7 @@ it('caches gamma client instance', function () {
     expect($gamma1)->toBe($gamma2);
 });
 
-it('caches clob client instance', function () {
+it('caches clob client instance', function (): void {
     $client = new Client();
 
     $clob1 = $client->clob();
@@ -66,21 +66,21 @@ it('caches clob client instance', function () {
     expect($clob1)->toBe($clob2);
 });
 
-it('gamma client provides markets resource', function () {
+it('gamma client provides markets resource', function (): void {
     $client = new Client();
     $markets = $client->gamma()->markets();
 
     expect($markets)->toBeInstanceOf(Markets::class);
 });
 
-it('clob client provides orders resource', function () {
+it('clob client provides orders resource', function (): void {
     $client = new Client();
     $orders = $client->clob()->orders();
 
     expect($orders)->toBeInstanceOf(Orders::class);
 });
 
-it('creates new resource instances on each call', function () {
+it('creates new resource instances on each call', function (): void {
     $client = new Client();
 
     $markets1 = $client->gamma()->markets();
@@ -92,14 +92,14 @@ it('creates new resource instances on each call', function () {
         ->and($markets2)->toBeInstanceOf(Markets::class);
 });
 
-it('provides bridge client', function () {
+it('provides bridge client', function (): void {
     $client = new Client();
     $bridge = $client->bridge();
 
     expect($bridge)->toBeInstanceOf(Bridge::class);
 });
 
-it('caches bridge client instance', function () {
+it('caches bridge client instance', function (): void {
     $client = new Client();
 
     $bridge1 = $client->bridge();
@@ -108,7 +108,7 @@ it('caches bridge client instance', function () {
     expect($bridge1)->toBe($bridge2);
 });
 
-it('bridge client provides deposits resource', function () {
+it('bridge client provides deposits resource', function (): void {
     $client = new Client();
     $deposits = $client->bridge()->deposits();
 

@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Series::list()', function () {
-    it('lists series', function () {
+describe('Series::list()', function (): void {
+    it('lists series', function (): void {
         $seriesData = [
             [
                 'id' => 'series1',
@@ -34,7 +34,7 @@ describe('Series::list()', function () {
             ->and($result[0]['title'])->toBe('NBA Finals 2024');
     });
 
-    it('handles empty series list', function () {
+    it('handles empty series list', function (): void {
         $this->fakeHttp->addJsonResponse('GET', '/series', []);
 
         $result = $this->client->gamma()->series()->list();
@@ -44,8 +44,8 @@ describe('Series::list()', function () {
     });
 });
 
-describe('Series::get()', function () {
-    it('gets series by ID', function () {
+describe('Series::get()', function (): void {
+    it('gets series by ID', function (): void {
         $seriesData = [
             'id' => 'series1',
             'title' => 'NBA Finals 2024',

@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Authentication::createApiKey()', function () {
-    it('creates a new API key', function () {
+describe('Authentication::createApiKey()', function (): void {
+    it('creates a new API key', function (): void {
         $apiKeyData = [
             'api_key' => 'test_key_123',
             'api_secret' => 'test_secret_456',
@@ -28,8 +28,8 @@ describe('Authentication::createApiKey()', function () {
     });
 });
 
-describe('Authentication::deriveApiKey()', function () {
-    it('derives existing API credentials', function () {
+describe('Authentication::deriveApiKey()', function (): void {
+    it('derives existing API credentials', function (): void {
         $apiKeyData = [
             'api_key' => 'derived_key_123',
             'api_secret' => 'derived_secret_456',
@@ -45,8 +45,8 @@ describe('Authentication::deriveApiKey()', function () {
     });
 });
 
-describe('Authentication::getApiKeys()', function () {
-    it('lists all API keys', function () {
+describe('Authentication::getApiKeys()', function (): void {
+    it('lists all API keys', function (): void {
         $apiKeysData = [
             'keys' => [
                 ['api_key' => 'key_1', 'created_at' => '2025-01-01T00:00:00Z'],
@@ -64,8 +64,8 @@ describe('Authentication::getApiKeys()', function () {
     });
 });
 
-describe('Authentication::deleteApiKey()', function () {
-    it('revokes current API key', function () {
+describe('Authentication::deleteApiKey()', function (): void {
+    it('revokes current API key', function (): void {
         $deleteResponse = ['success' => true, 'message' => 'API key deleted'];
 
         $this->fakeHttp->addJsonResponse('DELETE', '/api-key', $deleteResponse);

@@ -110,7 +110,7 @@ class ClobAuthenticator
      */
     public function generateL1Headers(int $nonce = 0, ?int $timestamp = null): array
     {
-        $timestamp = $timestamp ?? time();
+        $timestamp ??= time();
         $signature = $this->signer->signClobAuth($timestamp, $nonce);
 
         return [
@@ -134,11 +134,11 @@ class ClobAuthenticator
         ?string $body = null,
         ?int $timestamp = null
     ): array {
-        if ($this->credentials === null) {
+        if (!$this->credentials instanceof ApiCredentials) {
             throw ClobAuthenticationException::notSetup();
         }
 
-        $timestamp = $timestamp ?? time();
+        $timestamp ??= time();
 
         $signature = HmacSigner::sign(
             (string) $timestamp,
@@ -162,7 +162,7 @@ class ClobAuthenticator
      */
     public function hasCredentials(): bool
     {
-        return $this->credentials !== null;
+        return $this->credentials instanceof ApiCredentials;
     }
 
     /**

@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Server::healthCheck()', function () {
-    it('performs health check', function () {
+describe('Server::healthCheck()', function (): void {
+    it('performs health check', function (): void {
         $healthData = ['status' => 'ok', 'timestamp' => 1234567890];
 
         $this->fakeHttp->addJsonResponse('GET', '/', $healthData);
@@ -23,8 +23,8 @@ describe('Server::healthCheck()', function () {
     });
 });
 
-describe('Server::getTime()', function () {
-    it('retrieves current server timestamp', function () {
+describe('Server::getTime()', function (): void {
+    it('retrieves current server timestamp', function (): void {
         $timeData = ['timestamp' => 1234567890, 'iso' => '2025-01-15T12:00:00Z'];
 
         $this->fakeHttp->addJsonResponse('GET', '/time', $timeData);
@@ -37,8 +37,8 @@ describe('Server::getTime()', function () {
     });
 });
 
-describe('Server::getFeeRate()', function () {
-    it('fetches fee rate for token', function () {
+describe('Server::getFeeRate()', function (): void {
+    it('fetches fee rate for token', function (): void {
         $feeData = ['fee_rate_bps' => 10, 'fee_percentage' => '0.10'];
 
         $this->fakeHttp->addJsonResponse('GET', '/fee-rate', $feeData);
@@ -50,7 +50,7 @@ describe('Server::getFeeRate()', function () {
             ->and($result['fee_rate_bps'])->toBe(10);
     });
 
-    it('preserves decimal precision in fee rates', function () {
+    it('preserves decimal precision in fee rates', function (): void {
         $feeData = ['fee_rate_bps' => 15, 'fee_percentage' => '0.15'];
 
         $this->fakeHttp->addJsonResponse('GET', '/fee-rate', $feeData);

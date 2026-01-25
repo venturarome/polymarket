@@ -7,13 +7,13 @@ use Danielgnh\PolymarketPhp\Exceptions\JsonParseException;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 use Danielgnh\PolymarketPhp\Http\Response;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('JSON parsing errors', function () {
-    it('throws JsonParseException when response contains invalid json', function () {
+describe('JSON parsing errors', function (): void {
+    it('throws JsonParseException when response contains invalid json', function (): void {
         // Mock invalid JSON response
         $invalidJsonResponse = new Response(
             statusCode: 200,
@@ -26,7 +26,7 @@ describe('JSON parsing errors', function () {
         $this->client->gamma()->markets()->list();
     })->throws(JsonParseException::class);
 
-    it('throws JsonParseException with helpful message', function () {
+    it('throws JsonParseException with helpful message', function (): void {
         $invalidJsonResponse = new Response(
             statusCode: 200,
             headers: ['Content-Type' => 'application/json'],
@@ -43,7 +43,7 @@ describe('JSON parsing errors', function () {
         }
     });
 
-    it('includes partial response body in exception', function () {
+    it('includes partial response body in exception', function (): void {
         $invalidJsonResponse = new Response(
             statusCode: 200,
             headers: ['Content-Type' => 'application/json'],
@@ -61,8 +61,8 @@ describe('JSON parsing errors', function () {
     });
 });
 
-describe('Response validation', function () {
-    it('successfully processes valid json response', function () {
+describe('Response validation', function (): void {
+    it('successfully processes valid json response', function (): void {
         $validData = ['markets' => []];
         $this->fakeHttp->addJsonResponse('GET', '/markets', $validData);
 
@@ -71,7 +71,7 @@ describe('Response validation', function () {
         expect($result)->toBeArray();
     });
 
-    it('handles empty json response', function () {
+    it('handles empty json response', function (): void {
         $this->fakeHttp->addJsonResponse('GET', '/markets', []);
 
         $result = $this->client->gamma()->markets()->list();
@@ -80,7 +80,7 @@ describe('Response validation', function () {
             ->and($result)->toBeEmpty();
     });
 
-    it('handles deeply nested json response', function () {
+    it('handles deeply nested json response', function (): void {
         $nestedData = [
             [
                 'id' => 'test',
@@ -100,20 +100,20 @@ describe('Response validation', function () {
     });
 });
 
-describe('Client error handling', function () {
-    it('creates client with valid configuration', function () {
+describe('Client error handling', function (): void {
+    it('creates client with valid configuration', function (): void {
         $client = new Client('test-api-key');
 
         expect($client)->toBeInstanceOf(Client::class);
     });
 
-    it('creates client without api key', function () {
+    it('creates client without api key', function (): void {
         $client = new Client();
 
         expect($client)->toBeInstanceOf(Client::class);
     });
 
-    it('handles custom configuration options', function () {
+    it('handles custom configuration options', function (): void {
         $client = new Client('test-key', [
             'base_url' => 'https://custom-api.example.com',
             'timeout' => 60,
@@ -123,7 +123,7 @@ describe('Client error handling', function () {
         expect($client)->toBeInstanceOf(Client::class);
     });
 
-    it('accepts custom http client', function () {
+    it('accepts custom http client', function (): void {
         $fakeHttp = new FakeGuzzleHttpClient();
         $client = new Client(gammaHttpClient: $fakeHttp, clobHttpClient: $fakeHttp);
 
@@ -131,8 +131,8 @@ describe('Client error handling', function () {
     });
 });
 
-describe('Resource error scenarios', function () {
-    it('handles market not found gracefully', function () {
+describe('Resource error scenarios', function (): void {
+    it('handles market not found gracefully', function (): void {
         // Mock 404 response
         $notFoundResponse = new Response(
             statusCode: 404,
@@ -148,7 +148,7 @@ describe('Resource error scenarios', function () {
             ->and($result)->toHaveKey('error');
     });
 
-    it('handles order not found gracefully', function () {
+    it('handles order not found gracefully', function (): void {
         $notFoundResponse = new Response(
             statusCode: 404,
             headers: ['Content-Type' => 'application/json'],
@@ -164,16 +164,14 @@ describe('Resource error scenarios', function () {
     });
 });
 
-describe('Edge cases', function () {
-    it('handles large json response', function () {
+describe('Edge cases', function (): void {
+    it('handles large json response', function (): void {
         // Create large dataset
-        $largeDataset = array_map(function ($i) {
-            return [
-                'id' => "market_{$i}",
-                'question' => "Question {$i}",
-                'description' => str_repeat("Description {$i} ", 100),
-            ];
-        }, range(1, 1000));
+        $largeDataset = array_map(fn ($i): array => [
+            'id' => "market_{$i}",
+            'question' => "Question {$i}",
+            'description' => str_repeat("Description {$i} ", 100),
+        ], range(1, 1000));
 
         $this->fakeHttp->addJsonResponse('GET', '/markets', $largeDataset);
 
@@ -183,7 +181,7 @@ describe('Edge cases', function () {
             ->and($result)->toHaveCount(1000);
     });
 
-    it('handles special characters in json', function () {
+    it('handles special characters in json', function (): void {
         $specialData = [
             [
                 'id' => 'test',
@@ -200,7 +198,7 @@ describe('Edge cases', function () {
             ->and($result[0]['question'])->toContain('😀');
     });
 
-    it('handles unicode characters correctly', function () {
+    it('handles unicode characters correctly', function (): void {
         $unicodeData = [
             [
                 'id' => 'test',
@@ -217,7 +215,7 @@ describe('Edge cases', function () {
             ->and($result[0]['description'])->toBe('Тест на русском');
     });
 
-    it('handles null values in response', function () {
+    it('handles null values in response', function (): void {
         $dataWithNulls = [
             [
                 'id' => 'test',
@@ -236,8 +234,8 @@ describe('Edge cases', function () {
     });
 });
 
-describe('Decimal precision edge cases', function () {
-    it('preserves exact decimal values in prices', function () {
+describe('Decimal precision edge cases', function (): void {
+    it('preserves exact decimal values in prices', function (): void {
         $preciseData = [
             'id' => 'test',
             'outcomePrices' => ['0.123456789012345', '0.876543210987655'],
@@ -252,7 +250,7 @@ describe('Decimal precision edge cases', function () {
             ->and($result['volume'])->toBe('12345678901234.567890');
     });
 
-    it('handles zero values correctly', function () {
+    it('handles zero values correctly', function (): void {
         $zeroData = [
             'id' => 'test',
             'price' => '0.00',
@@ -269,7 +267,7 @@ describe('Decimal precision edge cases', function () {
             ->and($result['filledSize'])->toBe('0.00');
     });
 
-    it('handles very large numbers', function () {
+    it('handles very large numbers', function (): void {
         $largeNumbers = [
             'id' => 'test',
             'volume' => '999999999999999.99',

@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Spreads::get()', function () {
-    it('fetches spread for a token', function () {
+describe('Spreads::get()', function (): void {
+    it('fetches spread for a token', function (): void {
         $spreadData = ['spread' => '0.02', 'bid' => '0.51', 'ask' => '0.53'];
 
         $this->fakeHttp->addJsonResponse('GET', '/spread', $spreadData);
@@ -23,7 +23,7 @@ describe('Spreads::get()', function () {
             ->and($result['spread'])->toBe('0.02');
     });
 
-    it('preserves decimal precision in spreads', function () {
+    it('preserves decimal precision in spreads', function (): void {
         $spreadData = [
             'spread' => '0.0123456789',
             'bid' => '0.4876543211',
@@ -40,8 +40,8 @@ describe('Spreads::get()', function () {
     });
 });
 
-describe('Spreads::getMultiple()', function () {
-    it('fetches spreads for multiple tokens', function () {
+describe('Spreads::getMultiple()', function (): void {
+    it('fetches spreads for multiple tokens', function (): void {
         $spreadsData = [
             ['token_id' => 'token_1', 'spread' => '0.02'],
             ['token_id' => 'token_2', 'spread' => '0.03'],

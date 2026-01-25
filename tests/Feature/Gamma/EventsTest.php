@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Events::list()', function () {
-    it('lists events with pagination', function () {
+describe('Events::list()', function (): void {
+    it('lists events with pagination', function (): void {
         $eventsData = [
             [
                 'id' => 'event1',
@@ -36,7 +36,7 @@ describe('Events::list()', function () {
             ->and($result[0]['title'])->toBe('US Presidential Election 2024');
     });
 
-    it('applies limit parameter', function () {
+    it('applies limit parameter', function (): void {
         $eventsData = [
             ['id' => 'event1', 'title' => 'Event 1'],
         ];
@@ -48,7 +48,7 @@ describe('Events::list()', function () {
         expect($result)->toHaveCount(1);
     });
 
-    it('applies offset parameter', function () {
+    it('applies offset parameter', function (): void {
         $eventsData = [
             ['id' => 'event2', 'title' => 'Event 2'],
         ];
@@ -60,7 +60,7 @@ describe('Events::list()', function () {
         expect($result)->toBeArray();
     });
 
-    it('applies custom filters', function () {
+    it('applies custom filters', function (): void {
         $eventsData = [
             ['id' => 'event1', 'title' => 'Active Event', 'active' => true],
         ];
@@ -74,8 +74,8 @@ describe('Events::list()', function () {
     });
 });
 
-describe('Events::get()', function () {
-    it('gets event by ID', function () {
+describe('Events::get()', function (): void {
+    it('gets event by ID', function (): void {
         $eventData = [
             'id' => 'event1',
             'title' => 'US Presidential Election 2024',
@@ -96,8 +96,8 @@ describe('Events::get()', function () {
     });
 });
 
-describe('Events::getBySlug()', function () {
-    it('gets event by slug', function () {
+describe('Events::getBySlug()', function (): void {
+    it('gets event by slug', function (): void {
         $eventData = [
             'id' => 'event1',
             'title' => 'US Presidential Election 2024',
@@ -114,8 +114,8 @@ describe('Events::getBySlug()', function () {
     });
 });
 
-describe('Events::tags()', function () {
-    it('gets event tags', function () {
+describe('Events::tags()', function (): void {
+    it('gets event tags', function (): void {
         $tagsData = [
             ['id' => 'tag1', 'label' => 'Politics'],
             ['id' => 'tag2', 'label' => 'US'],

@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Markets::list()', function () {
-    it('fetches market listing', function () {
+describe('Markets::list()', function (): void {
+    it('fetches market listing', function (): void {
         $marketsData = [
             'data' => [
                 ['condition_id' => 'market_1', 'question' => 'Will this happen?'],
@@ -29,8 +29,8 @@ describe('Markets::list()', function () {
     });
 });
 
-describe('Markets::getSimplified()', function () {
-    it('fetches simplified market data', function () {
+describe('Markets::getSimplified()', function (): void {
+    it('fetches simplified market data', function (): void {
         $simplifiedData = [
             'data' => [
                 ['condition_id' => 'market_1', 'question' => 'Simple question?'],
@@ -46,8 +46,8 @@ describe('Markets::getSimplified()', function () {
     });
 });
 
-describe('Markets::getSampling()', function () {
-    it('fetches sampling markets', function () {
+describe('Markets::getSampling()', function (): void {
+    it('fetches sampling markets', function (): void {
         $samplingData = [
             'data' => [
                 ['condition_id' => 'sample_1'],
@@ -62,8 +62,8 @@ describe('Markets::getSampling()', function () {
     });
 });
 
-describe('Markets::getSamplingSimplified()', function () {
-    it('fetches simplified sampling markets', function () {
+describe('Markets::getSamplingSimplified()', function (): void {
+    it('fetches simplified sampling markets', function (): void {
         $simplifiedSamplingData = [
             'data' => [
                 ['condition_id' => 'sample_1'],
@@ -78,8 +78,8 @@ describe('Markets::getSamplingSimplified()', function () {
     });
 });
 
-describe('Markets::get()', function () {
-    it('fetches single market by condition ID', function () {
+describe('Markets::get()', function (): void {
+    it('fetches single market by condition ID', function (): void {
         $marketData = [
             'condition_id' => 'market_123',
             'question' => 'Will this happen?',
@@ -99,8 +99,8 @@ describe('Markets::get()', function () {
     });
 });
 
-describe('Markets::getTradeEvents()', function () {
-    it('fetches trade events for a market', function () {
+describe('Markets::getTradeEvents()', function (): void {
+    it('fetches trade events for a market', function (): void {
         $tradeEventsData = [
             ['event_id' => 'event_1', 'type' => 'trade', 'price' => '0.52'],
             ['event_id' => 'event_2', 'type' => 'trade', 'price' => '0.53'],

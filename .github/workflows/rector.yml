@@ -1,4 +1,4 @@
-name: Code Style
+name: Rector
 
 on:
   push:
@@ -7,12 +7,12 @@ on:
     branches: [ main, dev ]
 
 jobs:
-  lint:
+  rector:
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
-    name: PHP CS Fixer
+    name: Rector Analysis
 
     steps:
       - name: Checkout code
@@ -23,7 +23,7 @@ jobs:
         with:
           php-version: '8.4'
           coverage: none
-          tools: composer:v2, cs2pr
+          tools: composer:v2
 
       - name: Get composer cache directory
         id: composer-cache
@@ -39,5 +39,5 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
 
-      - name: Run PHP CS Fixer
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+      - name: Run Rector
+        run: vendor/bin/rector process --dry-run

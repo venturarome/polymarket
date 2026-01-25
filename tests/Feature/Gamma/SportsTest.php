@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Sports::list()', function () {
-    it('retrieves sports metadata', function () {
+describe('Sports::list()', function (): void {
+    it('retrieves sports metadata', function (): void {
         $sportsData = [
             [
                 'id' => 'sport1',
@@ -37,7 +37,7 @@ describe('Sports::list()', function () {
             ->and($result[1]['name'])->toBe('Football');
     });
 
-    it('handles empty sports list', function () {
+    it('handles empty sports list', function (): void {
         $this->fakeHttp->addJsonResponse('GET', '/sports', []);
 
         $result = $this->client->gamma()->sports()->list();
@@ -47,8 +47,8 @@ describe('Sports::list()', function () {
     });
 });
 
-describe('Sports::teams()', function () {
-    it('lists teams', function () {
+describe('Sports::teams()', function (): void {
+    it('lists teams', function (): void {
         $teamsData = [
             [
                 'id' => 'team1',

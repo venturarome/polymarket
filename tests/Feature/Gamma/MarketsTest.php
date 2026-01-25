@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Markets::list()', function () {
-    it('fetches list of markets successfully', function () {
+describe('Markets::list()', function (): void {
+    it('fetches list of markets successfully', function (): void {
         $marketsData = $this->loadFixture('markets_list.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/markets', $marketsData);
@@ -25,7 +25,7 @@ describe('Markets::list()', function () {
             ->and($result[0]['id'])->toBe('0x1234567890abcdef');
     });
 
-    it('applies limit parameter correctly', function () {
+    it('applies limit parameter correctly', function (): void {
         $marketsData = $this->loadFixture('markets_list.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/markets', array_slice($marketsData, 0, 2));
@@ -38,7 +38,7 @@ describe('Markets::list()', function () {
         expect($this->fakeHttp->hasRequest('GET', '/markets'))->toBeTrue();
     });
 
-    it('applies offset parameter for pagination', function () {
+    it('applies offset parameter for pagination', function (): void {
         $marketsData = $this->loadFixture('markets_list.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/markets', array_slice($marketsData, 1));
@@ -49,9 +49,9 @@ describe('Markets::list()', function () {
             ->and($result[0]['id'])->toBe('0xfedcba0987654321');
     });
 
-    it('applies custom filters', function () {
+    it('applies custom filters', function (): void {
         $marketsData = $this->loadFixture('markets_list.json');
-        $filteredData = array_filter($marketsData, fn ($m) => in_array('crypto', $m['tags']));
+        $filteredData = array_filter($marketsData, fn ($m): bool => in_array('crypto', $m['tags']));
 
         $this->fakeHttp->addJsonResponse('GET', '/markets', array_values($filteredData));
 
@@ -65,7 +65,7 @@ describe('Markets::list()', function () {
         }
     });
 
-    it('handles empty markets list', function () {
+    it('handles empty markets list', function (): void {
         $this->fakeHttp->addJsonResponse('GET', '/markets', []);
 
         $result = $this->client->gamma()->markets()->list();
@@ -75,8 +75,8 @@ describe('Markets::list()', function () {
     });
 });
 
-describe('Markets::get()', function () {
-    it('fetches single market by id', function () {
+describe('Markets::get()', function (): void {
+    it('fetches single market by id', function (): void {
         $marketData = $this->loadFixture('market.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/markets/0x1234567890abcdef', $marketData);
@@ -90,7 +90,7 @@ describe('Markets::get()', function () {
             ->and($result['outcomePrices'])->toBe(['0.52', '0.48']);
     });
 
-    it('handles market with all fields', function () {
+    it('handles market with all fields', function (): void {
         $marketData = $this->loadFixture('market.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/markets/0x1234567890abcdef', $marketData);
@@ -112,7 +112,7 @@ describe('Markets::get()', function () {
         ]);
     });
 
-    it('preserves decimal precision in prices', function () {
+    it('preserves decimal precision in prices', function (): void {
         $marketData = $this->loadFixture('market.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/markets/0x1234567890abcdef', $marketData);
@@ -127,8 +127,8 @@ describe('Markets::get()', function () {
     });
 });
 
-describe('Markets::getBySlug()', function () {
-    it('fetches market by slug', function () {
+describe('Markets::getBySlug()', function (): void {
+    it('fetches market by slug', function (): void {
         $marketData = $this->loadFixture('market.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/markets/slug/bitcoin-100k-2025', $marketData);
@@ -141,8 +141,8 @@ describe('Markets::getBySlug()', function () {
     });
 });
 
-describe('Markets::tags()', function () {
-    it('fetches market tags', function () {
+describe('Markets::tags()', function (): void {
+    it('fetches market tags', function (): void {
         $tagsData = [
             ['id' => 'tag1', 'label' => 'Crypto'],
             ['id' => 'tag2', 'label' => 'Bitcoin'],
@@ -158,8 +158,8 @@ describe('Markets::tags()', function () {
     });
 });
 
-describe('Markets integration scenarios', function () {
-    it('can fetch list and then get individual market', function () {
+describe('Markets integration scenarios', function (): void {
+    it('can fetch list and then get individual market', function (): void {
         // First, list markets
         $listData = $this->loadFixture('markets_list.json');
         $this->fakeHttp->addJsonResponse('GET', '/markets', $listData);

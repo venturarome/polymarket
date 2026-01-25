@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Search::search()', function () {
-    it('searches markets, events, and profiles', function () {
+describe('Search::search()', function (): void {
+    it('searches markets, events, and profiles', function (): void {
         $searchResults = [
             'markets' => [
                 ['id' => 'market1', 'question' => 'Will Bitcoin reach $100k?', 'type' => 'market'],
@@ -33,7 +33,7 @@ describe('Search::search()', function () {
             ->and($result['markets'][0]['question'])->toContain('Bitcoin');
     });
 
-    it('applies filters to search', function () {
+    it('applies filters to search', function (): void {
         $searchResults = [
             'markets' => [
                 ['id' => 'market1', 'question' => 'Will Bitcoin reach $100k?', 'active' => true],
@@ -50,7 +50,7 @@ describe('Search::search()', function () {
             ->and($result['markets'])->toBeArray();
     });
 
-    it('handles empty search results', function () {
+    it('handles empty search results', function (): void {
         $searchResults = [
             'markets' => [],
             'events' => [],
@@ -67,7 +67,7 @@ describe('Search::search()', function () {
             ->and($result['profiles'])->toBeEmpty();
     });
 
-    it('handles search with only markets', function () {
+    it('handles search with only markets', function (): void {
         $searchResults = [
             'markets' => [
                 ['id' => 'market1', 'question' => 'Election 2024?'],

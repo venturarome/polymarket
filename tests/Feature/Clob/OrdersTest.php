@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Orders::list()', function () {
-    it('fetches list of orders successfully', function () {
+describe('Orders::list()', function (): void {
+    it('fetches list of orders successfully', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/orders', $ordersData);
@@ -25,7 +25,7 @@ describe('Orders::list()', function () {
             ->and($result[0]['id'])->toBe('order_123456');
     });
 
-    it('applies pagination parameters', function () {
+    it('applies pagination parameters', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/orders', array_slice($ordersData, 0, 1));
@@ -36,9 +36,9 @@ describe('Orders::list()', function () {
             ->and($result[0]['id'])->toBe('order_123456');
     });
 
-    it('filters orders by status', function () {
+    it('filters orders by status', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
-        $openOrders = array_filter($ordersData, fn ($o) => $o['status'] === 'open');
+        $openOrders = array_filter($ordersData, fn ($o): bool => $o['status'] === 'open');
 
         $this->fakeHttp->addJsonResponse('GET', '/orders', array_values($openOrders));
 
@@ -51,10 +51,10 @@ describe('Orders::list()', function () {
         }
     });
 
-    it('filters orders by market id', function () {
+    it('filters orders by market id', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
         $marketId = '0x1234567890abcdef';
-        $marketOrders = array_filter($ordersData, fn ($o) => $o['marketId'] === $marketId);
+        $marketOrders = array_filter($ordersData, fn ($o): bool => $o['marketId'] === $marketId);
 
         $this->fakeHttp->addJsonResponse('GET', '/orders', array_values($marketOrders));
 
@@ -67,7 +67,7 @@ describe('Orders::list()', function () {
         }
     });
 
-    it('handles empty orders list', function () {
+    it('handles empty orders list', function (): void {
         $this->fakeHttp->addJsonResponse('GET', '/orders', []);
 
         $result = $this->client->clob()->orders()->list();
@@ -77,8 +77,8 @@ describe('Orders::list()', function () {
     });
 });
 
-describe('Orders::get()', function () {
-    it('fetches single order by id', function () {
+describe('Orders::get()', function (): void {
+    it('fetches single order by id', function (): void {
         $orderData = $this->loadFixture('order.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/orders/order_123456', $orderData);
@@ -91,7 +91,7 @@ describe('Orders::get()', function () {
             ->and($result['status'])->toBe('open');
     });
 
-    it('includes all order details', function () {
+    it('includes all order details', function (): void {
         $orderData = $this->loadFixture('order.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/orders/order_123456', $orderData);
@@ -114,7 +114,7 @@ describe('Orders::get()', function () {
         ]);
     });
 
-    it('preserves decimal precision in order prices and sizes', function () {
+    it('preserves decimal precision in order prices and sizes', function (): void {
         $orderData = $this->loadFixture('order.json');
 
         $this->fakeHttp->addJsonResponse('GET', '/orders/order_123456', $orderData);
@@ -129,8 +129,8 @@ describe('Orders::get()', function () {
     });
 });
 
-describe('Orders::create()', function () {
-    it('creates a new order successfully', function () {
+describe('Orders::create()', function (): void {
+    it('creates a new order successfully', function (): void {
         $createdOrder = $this->loadFixture('order_created.json');
 
         $this->fakeHttp->addJsonResponse('POST', '/orders', $createdOrder, 201);
@@ -152,7 +152,7 @@ describe('Orders::create()', function () {
             ->and($result['size'])->toBe('50.00');
     });
 
-    it('creates buy order', function () {
+    it('creates buy order', function (): void {
         $createdOrder = $this->loadFixture('order_created.json');
 
         $this->fakeHttp->addJsonResponse('POST', '/orders', $createdOrder, 201);
@@ -170,7 +170,7 @@ describe('Orders::create()', function () {
         expect($result['side'])->toBe('buy');
     });
 
-    it('creates sell order', function () {
+    it('creates sell order', function (): void {
         $orderData = [
             'marketId' => '0x1234567890abcdef',
             'outcome' => 'No',
@@ -191,7 +191,7 @@ describe('Orders::create()', function () {
         expect($result['side'])->toBe('sell');
     });
 
-    it('returns newly created order with all fields', function () {
+    it('returns newly created order with all fields', function (): void {
         $createdOrder = $this->loadFixture('order_created.json');
 
         $this->fakeHttp->addJsonResponse('POST', '/orders', $createdOrder, 201);
@@ -211,8 +211,8 @@ describe('Orders::create()', function () {
     });
 });
 
-describe('Orders::cancel()', function () {
-    it('cancels an order successfully', function () {
+describe('Orders::cancel()', function (): void {
+    it('cancels an order successfully', function (): void {
         $cancelledOrder = $this->loadFixture('order_cancelled.json');
 
         $this->fakeHttp->addJsonResponse('DELETE', '/orders/order_123456', $cancelledOrder);
@@ -225,7 +225,7 @@ describe('Orders::cancel()', function () {
             ->and($result)->toHaveKey('cancelledAt');
     });
 
-    it('returns cancelled order details', function () {
+    it('returns cancelled order details', function (): void {
         $cancelledOrder = $this->loadFixture('order_cancelled.json');
 
         $this->fakeHttp->addJsonResponse('DELETE', '/orders/order_123456', $cancelledOrder);
@@ -241,8 +241,8 @@ describe('Orders::cancel()', function () {
     });
 });
 
-describe('Orders integration scenarios', function () {
-    it('can create and then fetch order', function () {
+describe('Orders integration scenarios', function (): void {
+    it('can create and then fetch order', function (): void {
         // Create order
         $createdOrder = $this->loadFixture('order_created.json');
         $this->fakeHttp->addJsonResponse('POST', '/orders', $createdOrder, 201);
@@ -270,7 +270,7 @@ describe('Orders integration scenarios', function () {
             ->and($fetched['status'])->toBe('open');
     });
 
-    it('can create and then cancel order', function () {
+    it('can create and then cancel order', function (): void {
         // Create order
         $createdOrder = $this->loadFixture('order_created.json');
         $this->fakeHttp->addJsonResponse('POST', '/orders', $createdOrder, 201);
@@ -299,10 +299,10 @@ describe('Orders integration scenarios', function () {
             ->and($cancelled)->toHaveKey('cancelledAt');
     });
 
-    it('can list orders for specific market', function () {
+    it('can list orders for specific market', function (): void {
         $marketId = '0x1234567890abcdef';
         $ordersData = $this->loadFixture('orders_list.json');
-        $marketOrders = array_filter($ordersData, fn ($o) => $o['marketId'] === $marketId);
+        $marketOrders = array_filter($ordersData, fn ($o): bool => $o['marketId'] === $marketId);
 
         $this->fakeHttp->addJsonResponse('GET', '/orders', array_values($marketOrders));
 

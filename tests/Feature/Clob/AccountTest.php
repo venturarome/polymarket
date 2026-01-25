@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Account::getBalanceAllowance()', function () {
-    it('fetches balance and allowance information', function () {
+describe('Account::getBalanceAllowance()', function (): void {
+    it('fetches balance and allowance information', function (): void {
         $balanceData = [
             'balance' => '1000.00',
             'allowance' => '500.00',
@@ -28,8 +28,8 @@ describe('Account::getBalanceAllowance()', function () {
     });
 });
 
-describe('Account::updateBalanceAllowance()', function () {
-    it('updates allowance settings', function () {
+describe('Account::updateBalanceAllowance()', function (): void {
+    it('updates allowance settings', function (): void {
         $updateResponse = [
             'success' => true,
             'allowance' => '750.00',
@@ -44,8 +44,8 @@ describe('Account::updateBalanceAllowance()', function () {
     });
 });
 
-describe('Account::getNotifications()', function () {
-    it('retrieves user notifications', function () {
+describe('Account::getNotifications()', function (): void {
+    it('retrieves user notifications', function (): void {
         $notificationsData = [
             ['id' => 'notif_1', 'type' => 'order_filled', 'message' => 'Your order was filled'],
             ['id' => 'notif_2', 'type' => 'order_cancelled', 'message' => 'Your order was cancelled'],
@@ -61,8 +61,8 @@ describe('Account::getNotifications()', function () {
     });
 });
 
-describe('Account::dropNotifications()', function () {
-    it('deletes notifications', function () {
+describe('Account::dropNotifications()', function (): void {
+    it('deletes notifications', function (): void {
         $deleteResponse = ['success' => true, 'deleted_count' => 5];
 
         $this->fakeHttp->addJsonResponse('DELETE', '/notifications', $deleteResponse);
@@ -74,8 +74,8 @@ describe('Account::dropNotifications()', function () {
     });
 });
 
-describe('Account::getClosedOnlyMode()', function () {
-    it('checks account restriction status', function () {
+describe('Account::getClosedOnlyMode()', function (): void {
+    it('checks account restriction status', function (): void {
         $statusData = [
             'closed_only' => false,
             'reason' => null,

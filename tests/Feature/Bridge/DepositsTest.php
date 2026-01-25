@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(bridgeHttpClient: $this->fakeHttp);
 });
 
-describe('Deposits::supportedAssets()', function () {
-    it('fetches supported assets and chains successfully', function () {
+describe('Deposits::supportedAssets()', function (): void {
+    it('fetches supported assets and chains successfully', function (): void {
         $supportedAssetsData = [
             'chains' => [
                 [
@@ -66,7 +66,7 @@ describe('Deposits::supportedAssets()', function () {
             ->and($result['tokens'][0]['symbol'])->toBe('USDC');
     });
 
-    it('handles empty supported assets response', function () {
+    it('handles empty supported assets response', function (): void {
         $supportedAssetsData = [
             'chains' => [],
             'tokens' => [],
@@ -82,7 +82,7 @@ describe('Deposits::supportedAssets()', function () {
             ->and($result['tokens'])->toBeEmpty();
     });
 
-    it('returns chain details correctly', function () {
+    it('returns chain details correctly', function (): void {
         $supportedAssetsData = [
             'chains' => [
                 [
@@ -108,8 +108,8 @@ describe('Deposits::supportedAssets()', function () {
     });
 });
 
-describe('Deposits::generate()', function () {
-    it('generates deposit addresses successfully', function () {
+describe('Deposits::generate()', function (): void {
+    it('generates deposit addresses successfully', function (): void {
         $depositAddressData = [
             'evm' => '0x1234567890abcdef1234567890abcdef12345678',
             'solana' => 'SomeBase58SolanaAddress123456789',
@@ -132,7 +132,7 @@ describe('Deposits::generate()', function () {
             ->and($result['bitcoin'])->toBe('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh');
     });
 
-    it('passes correct parameters to API', function () {
+    it('passes correct parameters to API', function (): void {
         $depositData = [
             'destination_address' => '0xabcdef1234567890abcdef1234567890abcdef12',
             'amount_usd' => '250',
@@ -152,7 +152,7 @@ describe('Deposits::generate()', function () {
             ->and($this->fakeHttp->hasRequest('POST', '/deposit'))->toBeTrue();
     });
 
-    it('handles partial address generation', function () {
+    it('handles partial address generation', function (): void {
         // Sometimes not all chains may be available
         $depositAddressData = [
             'evm' => '0x1234567890abcdef1234567890abcdef12345678',
@@ -172,7 +172,7 @@ describe('Deposits::generate()', function () {
             ->and($result)->not->toHaveKey('bitcoin');
     });
 
-    it('handles minimum amount requirements', function () {
+    it('handles minimum amount requirements', function (): void {
         $depositAddressData = [
             'evm' => '0x1234567890abcdef1234567890abcdef12345678',
             'solana' => 'SomeBase58SolanaAddress123456789',
@@ -190,7 +190,7 @@ describe('Deposits::generate()', function () {
             ->and($result)->toHaveKey('evm');
     });
 
-    it('handles different deposit amounts', function () {
+    it('handles different deposit amounts', function (): void {
         $depositAddressData = [
             'evm' => '0x1234567890abcdef1234567890abcdef12345678',
             'solana' => 'SomeBase58SolanaAddress123456789',

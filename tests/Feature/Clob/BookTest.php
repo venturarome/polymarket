@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Book::get()', function () {
-    it('fetches order book for a token', function () {
+describe('Book::get()', function (): void {
+    it('fetches order book for a token', function (): void {
         $bookData = [
             'bids' => [
                 ['price' => '0.52', 'size' => '100.00'],
@@ -34,7 +34,7 @@ describe('Book::get()', function () {
             ->and($result['asks'])->toHaveCount(2);
     });
 
-    it('preserves decimal precision in prices and sizes', function () {
+    it('preserves decimal precision in prices and sizes', function (): void {
         $bookData = [
             'bids' => [['price' => '0.123456789', 'size' => '1000.123456']],
             'asks' => [['price' => '0.987654321', 'size' => '2000.987654']],
@@ -51,8 +51,8 @@ describe('Book::get()', function () {
     });
 });
 
-describe('Book::getMultiple()', function () {
-    it('fetches multiple order books', function () {
+describe('Book::getMultiple()', function (): void {
+    it('fetches multiple order books', function (): void {
         $booksData = [
             ['token_id' => 'token_1', 'bids' => [], 'asks' => []],
             ['token_id' => 'token_2', 'bids' => [], 'asks' => []],
@@ -70,8 +70,8 @@ describe('Book::getMultiple()', function () {
     });
 });
 
-describe('Book::getTickSize()', function () {
-    it('fetches tick size for a token', function () {
+describe('Book::getTickSize()', function (): void {
+    it('fetches tick size for a token', function (): void {
         $tickData = ['tick_size' => '0.01'];
 
         $this->fakeHttp->addJsonResponse('GET', '/tick-size', $tickData);
@@ -84,8 +84,8 @@ describe('Book::getTickSize()', function () {
     });
 });
 
-describe('Book::getNegRisk()', function () {
-    it('checks negative risk status for a token', function () {
+describe('Book::getNegRisk()', function (): void {
+    it('checks negative risk status for a token', function (): void {
         $negRiskData = ['neg_risk' => true];
 
         $this->fakeHttp->addJsonResponse('GET', '/neg-risk', $negRiskData);

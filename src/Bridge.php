@@ -19,12 +19,8 @@ use Danielgnh\PolymarketPhp\Resources\Bridge\Deposits;
  */
 class Bridge
 {
-    private HttpClientInterface $httpClient;
+    private readonly HttpClientInterface $httpClient;
 
-    /**
-     * @param Config                   $config
-     * @param HttpClientInterface|null $httpClient
-     */
     public function __construct(
         private readonly Config $config,
         ?HttpClientInterface $httpClient = null
@@ -34,8 +30,6 @@ class Bridge
 
     /**
      * Access deposit operations for generating cross-chain deposit addresses.
-     *
-     * @return Deposits
      */
     public function deposits(): Deposits
     {

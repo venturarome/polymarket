@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Comments::list()', function () {
-    it('lists comments', function () {
+describe('Comments::list()', function (): void {
+    it('lists comments', function (): void {
         $commentsData = [
             [
                 'id' => 'comment1',
@@ -37,8 +37,8 @@ describe('Comments::list()', function () {
     });
 });
 
-describe('Comments::get()', function () {
-    it('gets comment by ID', function () {
+describe('Comments::get()', function (): void {
+    it('gets comment by ID', function (): void {
         $commentData = [
             'id' => 'comment1',
             'content' => 'I think Bitcoin will reach 100k',
@@ -58,8 +58,8 @@ describe('Comments::get()', function () {
     });
 });
 
-describe('Comments::byUserAddress()', function () {
-    it('gets comments by user address', function () {
+describe('Comments::byUserAddress()', function (): void {
+    it('gets comments by user address', function (): void {
         $commentsData = [
             [
                 'id' => 'comment1',
@@ -83,7 +83,7 @@ describe('Comments::byUserAddress()', function () {
             ->and($result[1]['author'])->toBe('0x1234567890abcdef');
     });
 
-    it('handles empty comments for user', function () {
+    it('handles empty comments for user', function (): void {
         $this->fakeHttp->addJsonResponse('GET', '/comments/user_address/0xnonexistent', []);
 
         $result = $this->client->gamma()->comments()->byUserAddress('0xnonexistent');

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Danielgnh\PolymarketPhp\Config;
 
-it('creates config with default values', function () {
+it('creates config with default values', function (): void {
     $config = new Config();
 
     expect($config->apiKey)->toBeNull()
@@ -15,43 +15,43 @@ it('creates config with default values', function () {
         ->and($config->verifySSL)->toBeTrue();
 });
 
-it('creates config with api key', function () {
+it('creates config with api key', function (): void {
     $config = new Config('test-api-key');
 
     expect($config->apiKey)->toBe('test-api-key');
 });
 
-it('allows custom gamma base url', function () {
+it('allows custom gamma base url', function (): void {
     $config = new Config(null, ['gamma_base_url' => 'https://custom-gamma.example.com']);
 
     expect($config->gammaBaseUrl)->toBe('https://custom-gamma.example.com');
 });
 
-it('allows custom clob base url', function () {
+it('allows custom clob base url', function (): void {
     $config = new Config(null, ['clob_base_url' => 'https://custom-clob.example.com']);
 
     expect($config->clobBaseUrl)->toBe('https://custom-clob.example.com');
 });
 
-it('allows custom timeout', function () {
+it('allows custom timeout', function (): void {
     $config = new Config(null, ['timeout' => 60]);
 
     expect($config->timeout)->toBe(60);
 });
 
-it('allows custom retries', function () {
+it('allows custom retries', function (): void {
     $config = new Config(null, ['retries' => 5]);
 
     expect($config->retries)->toBe(5);
 });
 
-it('allows disabling ssl verification', function () {
+it('allows disabling ssl verification', function (): void {
     $config = new Config(null, ['verify_ssl' => false]);
 
     expect($config->verifySSL)->toBeFalse();
 });
 
-it('accepts multiple options at once', function () {
+it('accepts multiple options at once', function (): void {
     $config = new Config('my-key', [
         'gamma_base_url' => 'https://test-gamma.com',
         'clob_base_url' => 'https://test-clob.com',

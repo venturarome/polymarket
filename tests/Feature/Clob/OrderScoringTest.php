@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('OrderScoring::check()', function () {
-    it('checks if order qualifies for scoring', function () {
+describe('OrderScoring::check()', function (): void {
+    it('checks if order qualifies for scoring', function (): void {
         $scoringData = [
             'qualifies' => true,
             'score' => 95,
@@ -27,7 +27,7 @@ describe('OrderScoring::check()', function () {
             ->and($result['score'])->toBe(95);
     });
 
-    it('handles non-qualifying orders', function () {
+    it('handles non-qualifying orders', function (): void {
         $scoringData = [
             'qualifies' => false,
             'score' => 0,
@@ -44,8 +44,8 @@ describe('OrderScoring::check()', function () {
     });
 });
 
-describe('OrderScoring::checkMultiple()', function () {
-    it('checks multiple orders for scoring eligibility', function () {
+describe('OrderScoring::checkMultiple()', function (): void {
+    it('checks multiple orders for scoring eligibility', function (): void {
         $multipleScoresData = [
             ['order_id' => 'order_1', 'qualifies' => true, 'score' => 90],
             ['order_id' => 'order_2', 'qualifies' => false, 'score' => 0],

@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Exceptions\JsonParseException;
 use Danielgnh\PolymarketPhp\Http\Response;
 
-it('creates a response with status code, headers and body', function () {
+it('creates a response with status code, headers and body', function (): void {
     $response = new Response(
         statusCode: 200,
         headers: ['Content-Type' => 'application/json'],
@@ -17,7 +17,7 @@ it('creates a response with status code, headers and body', function () {
         ->and($response->body())->toBe('{"success": true}');
 });
 
-it('decodes json response body', function () {
+it('decodes json response body', function (): void {
     $response = new Response(
         statusCode: 200,
         headers: [],
@@ -29,7 +29,7 @@ it('decodes json response body', function () {
     expect($json)->toBe(['id' => '123', 'name' => 'Test Market']);
 });
 
-it('throws exception on invalid json', function () {
+it('throws exception on invalid json', function (): void {
     $response = new Response(
         statusCode: 200,
         headers: [],
@@ -39,7 +39,7 @@ it('throws exception on invalid json', function () {
     $response->json();
 })->throws(JsonParseException::class);
 
-it('identifies successful responses', function () {
+it('identifies successful responses', function (): void {
     $successResponse = new Response(200, [], '');
     $createdResponse = new Response(201, [], '');
     $errorResponse = new Response(404, [], '');
@@ -51,7 +51,7 @@ it('identifies successful responses', function () {
         ->and($serverErrorResponse->isSuccessful())->toBeFalse();
 });
 
-it('retrieves specific header by name', function () {
+it('retrieves specific header by name', function (): void {
     $response = new Response(
         statusCode: 200,
         headers: [
@@ -66,7 +66,7 @@ it('retrieves specific header by name', function () {
         ->and($response->header('Non-Existent'))->toBeNull();
 });
 
-it('handles empty response body', function () {
+it('handles empty response body', function (): void {
     $response = new Response(204, [], '');
 
     expect($response->body())->toBe('')

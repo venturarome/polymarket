@@ -12,7 +12,7 @@ use Danielgnh\PolymarketPhp\Http\HttpClientInterface;
 
 class Client
 {
-    private Config $config;
+    private readonly Config $config;
 
     private ?Gamma $gammaClient = null;
 
@@ -34,15 +34,15 @@ class Client
     ) {
         $this->config = new Config($apiKey, $options);
 
-        if ($gammaHttpClient !== null) {
+        if ($gammaHttpClient instanceof HttpClientInterface) {
             $this->gammaClient = new Gamma($this->config, $gammaHttpClient);
         }
 
-        if ($clobHttpClient !== null) {
+        if ($clobHttpClient instanceof HttpClientInterface) {
             $this->clobClient = new Clob($this->config, $clobHttpClient);
         }
 
-        if ($bridgeHttpClient !== null) {
+        if ($bridgeHttpClient instanceof HttpClientInterface) {
             $this->bridgeClient = new Bridge($this->config, $bridgeHttpClient);
         }
     }
@@ -84,7 +84,7 @@ class Client
 
     public function gamma(): Gamma
     {
-        if ($this->gammaClient === null) {
+        if (!$this->gammaClient instanceof Gamma) {
             $this->gammaClient = new Gamma($this->config);
         }
 
@@ -93,7 +93,7 @@ class Client
 
     public function clob(): Clob
     {
-        if ($this->clobClient === null) {
+        if (!$this->clobClient instanceof Clob) {
             $this->clobClient = new Clob(
                 $this->config,
                 null,
@@ -106,12 +106,10 @@ class Client
 
     /**
      * Get Bridge API client for cross-chain deposits.
-     *
-     * @return Bridge
      */
     public function bridge(): Bridge
     {
-        if ($this->bridgeClient === null) {
+        if (!$this->bridgeClient instanceof Bridge) {
             $this->bridgeClient = new Bridge($this->config);
         }
 

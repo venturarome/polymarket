@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(clobHttpClient: $this->fakeHttp);
 });
 
-describe('Pricing::getPrice()', function () {
-    it('fetches price for a token and side', function () {
+describe('Pricing::getPrice()', function (): void {
+    it('fetches price for a token and side', function (): void {
         $priceData = ['price' => '0.55'];
 
         $this->fakeHttp->addJsonResponse('GET', '/price', $priceData);
@@ -24,8 +24,8 @@ describe('Pricing::getPrice()', function () {
     });
 });
 
-describe('Pricing::getPrices()', function () {
-    it('fetches multiple prices', function () {
+describe('Pricing::getPrices()', function (): void {
+    it('fetches multiple prices', function (): void {
         $pricesData = [
             ['token_id' => 'token_1', 'price' => '0.52'],
             ['token_id' => 'token_2', 'price' => '0.48'],
@@ -43,8 +43,8 @@ describe('Pricing::getPrices()', function () {
     });
 });
 
-describe('Pricing::getMidpoint()', function () {
-    it('fetches midpoint price for a token', function () {
+describe('Pricing::getMidpoint()', function (): void {
+    it('fetches midpoint price for a token', function (): void {
         $midpointData = ['midpoint' => '0.525'];
 
         $this->fakeHttp->addJsonResponse('GET', '/midpoint', $midpointData);
@@ -57,8 +57,8 @@ describe('Pricing::getMidpoint()', function () {
     });
 });
 
-describe('Pricing::getMidpoints()', function () {
-    it('fetches multiple midpoints', function () {
+describe('Pricing::getMidpoints()', function (): void {
+    it('fetches multiple midpoints', function (): void {
         $midpointsData = [
             ['token_id' => 'token_1', 'midpoint' => '0.51'],
             ['token_id' => 'token_2', 'midpoint' => '0.49'],
@@ -76,8 +76,8 @@ describe('Pricing::getMidpoints()', function () {
     });
 });
 
-describe('Pricing::getLastTradePrice()', function () {
-    it('fetches last trade price for a token', function () {
+describe('Pricing::getLastTradePrice()', function (): void {
+    it('fetches last trade price for a token', function (): void {
         $lastPriceData = ['price' => '0.53', 'timestamp' => 1234567890];
 
         $this->fakeHttp->addJsonResponse('GET', '/last-trade-price', $lastPriceData);
@@ -90,8 +90,8 @@ describe('Pricing::getLastTradePrice()', function () {
     });
 });
 
-describe('Pricing::getLastTradesPrices()', function () {
-    it('fetches last trade prices for multiple tokens', function () {
+describe('Pricing::getLastTradesPrices()', function (): void {
+    it('fetches last trade prices for multiple tokens', function (): void {
         $lastPricesData = [
             ['token_id' => 'token_1', 'price' => '0.52'],
             ['token_id' => 'token_2', 'price' => '0.48'],
@@ -109,8 +109,8 @@ describe('Pricing::getLastTradesPrices()', function () {
     });
 });
 
-describe('Pricing::getPricesHistory()', function () {
-    it('fetches historical price data', function () {
+describe('Pricing::getPricesHistory()', function (): void {
+    it('fetches historical price data', function (): void {
         $historyData = [
             ['timestamp' => 1234567890, 'price' => '0.52'],
             ['timestamp' => 1234567900, 'price' => '0.53'],

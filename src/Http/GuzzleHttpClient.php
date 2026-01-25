@@ -19,16 +19,13 @@ use Psr\Http\Message\ResponseInterface;
 
 class GuzzleHttpClient implements HttpClientInterface
 {
-    private GuzzleClient $client;
-
-    private ?ClobAuthenticator $authenticator;
+    private readonly GuzzleClient $client;
 
     public function __construct(
         private readonly string $baseUrl,
         private readonly Config $config,
-        ?ClobAuthenticator $authenticator = null
+        private ?ClobAuthenticator $authenticator = null
     ) {
-        $this->authenticator = $authenticator;
         $this->client = new GuzzleClient([
             'base_uri' => $this->baseUrl,
             'timeout' => $this->config->timeout,
@@ -73,7 +70,7 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     public function delete(string $path, array $data = []): Response
     {
-        $options = empty($data) ? [] : ['json' => $data];
+        $options = $data === [] ? [] : ['json' => $data];
 
         return $this->request('DELETE', $path, $options);
     }
@@ -126,9 +123,7 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     private function normalizeHeaders(array $headers): array
     {
-        return array_map(function (array $values): string {
-            return implode(', ', $values);
-        }, $headers);
+        return array_map(fn (array $values): string => implode(', ', $values), $headers);
     }
 
     /**
@@ -183,9 +178,6 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     * @param GuzzleException $e
-     *
-     * @return never
      * @throws ApiException
      * @throws AuthenticationException
      * @throws NotFoundException

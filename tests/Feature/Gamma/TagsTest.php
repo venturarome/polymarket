@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
     $this->client = new Client(gammaHttpClient: $this->fakeHttp, clobHttpClient: $this->fakeHttp);
 });
 
-describe('Tags::list()', function () {
-    it('lists all tags', function () {
+describe('Tags::list()', function (): void {
+    it('lists all tags', function (): void {
         $tagsData = [
             ['id' => 'tag1', 'label' => 'Crypto', 'slug' => 'crypto'],
             ['id' => 'tag2', 'label' => 'Politics', 'slug' => 'politics'],
@@ -28,8 +28,8 @@ describe('Tags::list()', function () {
     });
 });
 
-describe('Tags::get()', function () {
-    it('gets tag by ID', function () {
+describe('Tags::get()', function (): void {
+    it('gets tag by ID', function (): void {
         $tagData = ['id' => 'tag1', 'label' => 'Crypto', 'slug' => 'crypto'];
 
         $this->fakeHttp->addJsonResponse('GET', '/tags/tag1', $tagData);
@@ -42,8 +42,8 @@ describe('Tags::get()', function () {
     });
 });
 
-describe('Tags::getBySlug()', function () {
-    it('gets tag by slug', function () {
+describe('Tags::getBySlug()', function (): void {
+    it('gets tag by slug', function (): void {
         $tagData = ['id' => 'tag1', 'label' => 'Crypto', 'slug' => 'crypto'];
 
         $this->fakeHttp->addJsonResponse('GET', '/tags/slug/crypto', $tagData);
@@ -56,8 +56,8 @@ describe('Tags::getBySlug()', function () {
     });
 });
 
-describe('Tags::relatedTags()', function () {
-    it('gets related tags by ID', function () {
+describe('Tags::relatedTags()', function (): void {
+    it('gets related tags by ID', function (): void {
         $relatedTagsData = [
             ['id' => 'tag2', 'label' => 'Bitcoin'],
             ['id' => 'tag3', 'label' => 'Ethereum'],
@@ -73,8 +73,8 @@ describe('Tags::relatedTags()', function () {
     });
 });
 
-describe('Tags::relatedTagsBySlug()', function () {
-    it('gets related tags by slug', function () {
+describe('Tags::relatedTagsBySlug()', function (): void {
+    it('gets related tags by slug', function (): void {
         $relatedTagsData = [
             ['id' => 'tag2', 'label' => 'Bitcoin'],
             ['id' => 'tag3', 'label' => 'Ethereum'],
@@ -89,8 +89,8 @@ describe('Tags::relatedTagsBySlug()', function () {
     });
 });
 
-describe('Tags::relatedTagsTags()', function () {
-    it('gets tags related to a tag ID', function () {
+describe('Tags::relatedTagsTags()', function (): void {
+    it('gets tags related to a tag ID', function (): void {
         $relatedTagsData = [
             ['id' => 'tag4', 'label' => 'DeFi'],
             ['id' => 'tag5', 'label' => 'NFT'],
@@ -105,8 +105,8 @@ describe('Tags::relatedTagsTags()', function () {
     });
 });
 
-describe('Tags::relatedTagsTagsBySlug()', function () {
-    it('gets tags related to a tag slug', function () {
+describe('Tags::relatedTagsTagsBySlug()', function (): void {
+    it('gets tags related to a tag slug', function (): void {
         $relatedTagsData = [
             ['id' => 'tag4', 'label' => 'DeFi'],
             ['id' => 'tag5', 'label' => 'NFT'],
