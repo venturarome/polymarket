@@ -14,7 +14,7 @@ describe('Orders::list()', function (): void {
     it('fetches list of orders successfully', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders', $ordersData);
+        $this->fakeHttp->addJsonResponse('GET', '/data/orders', $ordersData);
 
         $result = $this->client->clob()->orders()->list();
 
@@ -28,7 +28,7 @@ describe('Orders::list()', function (): void {
     it('applies pagination parameters', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders', array_slice($ordersData, 0, 1));
+        $this->fakeHttp->addJsonResponse('GET', '/data/orders', array_slice($ordersData, 0, 1));
 
         $result = $this->client->clob()->orders()->list(limit: 1, offset: 0);
 
@@ -40,7 +40,7 @@ describe('Orders::list()', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
         $openOrders = array_filter($ordersData, fn ($o): bool => $o['status'] === 'open');
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders', array_values($openOrders));
+        $this->fakeHttp->addJsonResponse('GET', '/data/orders', array_values($openOrders));
 
         $result = $this->client->clob()->orders()->list(filters: ['status' => 'open']);
 
@@ -56,7 +56,7 @@ describe('Orders::list()', function (): void {
         $marketId = '0x1234567890abcdef';
         $marketOrders = array_filter($ordersData, fn ($o): bool => $o['marketId'] === $marketId);
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders', array_values($marketOrders));
+        $this->fakeHttp->addJsonResponse('GET', '/data/orders', array_values($marketOrders));
 
         $result = $this->client->clob()->orders()->list(filters: ['marketId' => $marketId]);
 
@@ -68,7 +68,7 @@ describe('Orders::list()', function (): void {
     });
 
     it('handles empty orders list', function (): void {
-        $this->fakeHttp->addJsonResponse('GET', '/orders', []);
+        $this->fakeHttp->addJsonResponse('GET', '/data/orders', []);
 
         $result = $this->client->clob()->orders()->list();
 
@@ -81,7 +81,7 @@ describe('Orders::get()', function (): void {
     it('fetches single order by id', function (): void {
         $orderData = $this->loadFixture('order.json');
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders/order_123456', $orderData);
+        $this->fakeHttp->addJsonResponse('GET', '/data/order/order_123456', $orderData);
 
         $result = $this->client->clob()->orders()->get('order_123456');
 
@@ -94,7 +94,7 @@ describe('Orders::get()', function (): void {
     it('includes all order details', function (): void {
         $orderData = $this->loadFixture('order.json');
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders/order_123456', $orderData);
+        $this->fakeHttp->addJsonResponse('GET', '/data/order/order_123456', $orderData);
 
         $result = $this->client->clob()->orders()->get('order_123456');
 
@@ -117,7 +117,7 @@ describe('Orders::get()', function (): void {
     it('preserves decimal precision in order prices and sizes', function (): void {
         $orderData = $this->loadFixture('order.json');
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders/order_123456', $orderData);
+        $this->fakeHttp->addJsonResponse('GET', '/data/order/order_123456', $orderData);
 
         $result = $this->client->clob()->orders()->get('order_123456');
 
@@ -262,7 +262,7 @@ describe('Orders integration scenarios', function (): void {
 
         // Fetch the created order
         $orderDetails = $this->loadFixture('order_created.json');
-        $this->fakeHttp->addJsonResponse('GET', "/orders/{$orderId}", $orderDetails);
+        $this->fakeHttp->addJsonResponse('GET', "/data/order/{$orderId}", $orderDetails);
 
         $fetched = $this->client->clob()->orders()->get($orderId);
 
@@ -304,7 +304,7 @@ describe('Orders integration scenarios', function (): void {
         $ordersData = $this->loadFixture('orders_list.json');
         $marketOrders = array_filter($ordersData, fn ($o): bool => $o['marketId'] === $marketId);
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders', array_values($marketOrders));
+        $this->fakeHttp->addJsonResponse('GET', '/data/orders', array_values($marketOrders));
 
         $orders = $this->client->clob()->orders()->list(filters: ['marketId' => $marketId]);
 

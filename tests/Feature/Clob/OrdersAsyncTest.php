@@ -16,7 +16,7 @@ beforeEach(function (): void {
 describe('Orders::getAsync', function (): void {
     it('returns a promise that resolves to order data', function (): void {
         $orderData = ['id' => 'order-1', 'status' => 'open'];
-        $this->fakeHttp->addJsonResponse('GET', '/orders/order-1', $orderData);
+        $this->fakeHttp->addJsonResponse('GET', '/data/order/order-1', $orderData);
 
         $promise = $this->client->clob()->orders()->getAsync('order-1');
 
@@ -30,7 +30,7 @@ describe('Orders::getAsync', function (): void {
 describe('Orders::listAsync', function (): void {
     it('returns a promise that resolves to orders list', function (): void {
         $ordersData = ['orders' => [], 'next_cursor' => ''];
-        $this->fakeHttp->addJsonResponse('GET', '/orders', $ordersData);
+        $this->fakeHttp->addJsonResponse('GET', '/data/orders', $ordersData);
 
         $promise = $this->client->clob()->orders()->listAsync();
 
@@ -58,8 +58,8 @@ describe('Orders::getMany', function (): void {
         $order1 = ['id' => 'id1', 'status' => 'open'];
         $order2 = ['id' => 'id2', 'status' => 'filled'];
 
-        $this->fakeHttp->addJsonResponse('GET', '/orders/id1', $order1);
-        $this->fakeHttp->addJsonResponse('GET', '/orders/id2', $order2);
+        $this->fakeHttp->addJsonResponse('GET', '/data/order/id1', $order1);
+        $this->fakeHttp->addJsonResponse('GET', '/data/order/id2', $order2);
 
         $result = $this->client->clob()->orders()->getMany(['id1', 'id2']);
 
@@ -70,8 +70,8 @@ describe('Orders::getMany', function (): void {
     });
 
     it('handles partial failures', function (): void {
-        $this->fakeHttp->addJsonResponse('GET', '/orders/id1', ['id' => 'id1']);
-        $this->fakeHttp->addExceptionResponse('GET', '/orders/id2', new NotFoundException('Not found'));
+        $this->fakeHttp->addJsonResponse('GET', '/data/order/id1', ['id' => 'id1']);
+        $this->fakeHttp->addExceptionResponse('GET', '/data/order/id2', new NotFoundException('Not found'));
 
         $result = $this->client->clob()->orders()->getMany(['id1', 'id2']);
 
