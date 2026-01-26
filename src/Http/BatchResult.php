@@ -13,14 +13,14 @@ use LogicException;
 use Traversable;
 
 /**
- * @implements ArrayAccess<string, mixed>
- * @implements IteratorAggregate<string, mixed>
+ * @implements ArrayAccess<int|string, mixed>
+ * @implements IteratorAggregate<int|string, mixed>
  */
 class BatchResult implements ArrayAccess, Countable, IteratorAggregate
 {
     /**
-     * @param array<string, mixed> $succeeded
-     * @param array<string, PolymarketException> $failed
+     * @param array<int|string, mixed> $succeeded
+     * @param array<int|string, PolymarketException> $failed
      */
     public function __construct(
         public readonly array $succeeded,

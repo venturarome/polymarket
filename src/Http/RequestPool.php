@@ -28,10 +28,10 @@ class RequestPool
 
         $this->each(
             $promises,
-            function (mixed $value, int $key) use (&$succeeded): void {
+            function (mixed $value, int|string $key) use (&$succeeded): void {
                 $succeeded[$key] = $value;
             },
-            function (Throwable $reason, int $key) use (&$failed): void {
+            function (Throwable $reason, int|string $key) use (&$failed): void {
                 /** @var PolymarketException $reason */
                 $failed[$key] = $reason;
             },
