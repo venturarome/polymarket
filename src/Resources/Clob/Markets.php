@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Danielgnh\PolymarketPhp\Resources\Clob;
 
 use Danielgnh\PolymarketPhp\Exceptions\PolymarketException;
-use Danielgnh\PolymarketPhp\Http\AsyncClient;
+use Danielgnh\PolymarketPhp\Http\AsyncClientInterface;
 use Danielgnh\PolymarketPhp\Http\BatchResult;
-use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
+use Danielgnh\PolymarketPhp\Http\HttpClientInterface;
 use Danielgnh\PolymarketPhp\Http\Response;
 use Danielgnh\PolymarketPhp\Resources\Resource;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -111,13 +111,13 @@ class Markets extends Resource
         return $this->getAsyncClient()->pool($promises, $concurrency);
     }
 
-    private function getAsyncClient(): AsyncClient|FakeGuzzleHttpClient
+    private function getAsyncClient(): HttpClientInterface|AsyncClientInterface
     {
-        if ($this->asyncClient instanceof AsyncClient) {
+        if ($this->asyncClient instanceof AsyncClientInterface) {
             return $this->asyncClient;
         }
 
-        if ($this->httpClient instanceof FakeGuzzleHttpClient) {
+        if ($this->httpClient instanceof HttpClientInterface) {
             return $this->httpClient;
         }
 

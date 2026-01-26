@@ -9,7 +9,7 @@ use Danielgnh\PolymarketPhp\Auth\Signer\Eip712Signer;
 use Danielgnh\PolymarketPhp\Exceptions\ClobAuthenticationException;
 use Danielgnh\PolymarketPhp\Exceptions\SigningException;
 use Danielgnh\PolymarketPhp\Http\AsyncClient;
-use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
+use Danielgnh\PolymarketPhp\Http\AsyncClientInterface;
 use Danielgnh\PolymarketPhp\Http\GuzzleHttpClient;
 use Danielgnh\PolymarketPhp\Http\HttpClientInterface;
 
@@ -31,19 +31,19 @@ class Client
     public function __construct(
         ?string $apiKey = null,
         array $options = [],
-        ?HttpClientInterface $gammaHttpClient = null,
-        ?HttpClientInterface $clobHttpClient = null,
+        HttpClientInterface|AsyncClientInterface|null $gammaHttpClient = null,
+        HttpClientInterface|AsyncClientInterface|null $clobHttpClient = null,
         ?HttpClientInterface $bridgeHttpClient = null
     ) {
         $this->config = new Config($apiKey, $options);
 
         if ($gammaHttpClient instanceof HttpClientInterface) {
-            $asyncClient = $gammaHttpClient instanceof FakeGuzzleHttpClient ? $gammaHttpClient : null;
+            $asyncClient = $gammaHttpClient instanceof AsyncClientInterface ? $gammaHttpClient : null;
             $this->gammaClient = new Gamma($this->config, $gammaHttpClient, $asyncClient);
         }
 
         if ($clobHttpClient instanceof HttpClientInterface) {
-            $asyncClient = $clobHttpClient instanceof FakeGuzzleHttpClient ? $clobHttpClient : null;
+            $asyncClient = $clobHttpClient instanceof AsyncClientInterface ? $clobHttpClient : null;
             $this->clobClient = new Clob($this->config, $clobHttpClient, null, $asyncClient);
         }
 
