@@ -99,10 +99,10 @@ class AsyncClient implements AsyncClientInterface
     private function mapException(\Throwable $e): PolymarketException
     {
         if (!$e instanceof RequestException) {
-            return new PolymarketException($e->getMessage(), (int) $e->getCode());
+            return new PolymarketException($e->getMessage(), $e->getCode());
         }
 
-        $code = $e->getCode();
+        $code = $e->getResponse()?->getStatusCode() ?? 0;
         $message = $e->getMessage();
 
         return match (true) {

@@ -6,6 +6,7 @@ namespace PolymarketPhp\Polymarket\Http;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use PolymarketPhp\Polymarket\Auth\ClobAuthenticator;
 use PolymarketPhp\Polymarket\Config;
 use PolymarketPhp\Polymarket\Exceptions\ApiException;
@@ -192,7 +193,9 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     private function handleException(GuzzleException $e): never
     {
-        $code = $e->getCode();
+        $code = $e instanceof RequestException
+            ? $e->getResponse()?->getStatusCode() ?? 0
+            : $e->getCode();
         $message = $e->getMessage();
 
         throw match (true) {
