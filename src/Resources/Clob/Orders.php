@@ -5,15 +5,29 @@ declare(strict_types=1);
 namespace PolymarketPhp\Polymarket\Resources\Clob;
 
 use GuzzleHttp\Promise\PromiseInterface;
+use PolymarketPhp\Polymarket\Config;
+use PolymarketPhp\Polymarket\Enums\OrderSide;
 use PolymarketPhp\Polymarket\Exceptions\PolymarketException;
+use PolymarketPhp\Polymarket\Http\AsyncClientInterface;
 use PolymarketPhp\Polymarket\Http\BatchResult;
+use PolymarketPhp\Polymarket\Http\HttpClientInterface;
 use PolymarketPhp\Polymarket\Http\Response;
 use PolymarketPhp\Polymarket\Resources\Resource;
 use PolymarketPhp\Polymarket\Resources\Traits\HasAsyncClient;
+use PolymarketPhp\Polymarket\Signing\Eip712Signer;
+use PolymarketPhp\Polymarket\Signing\TypedData\OrderPayload;
 
 class Orders extends Resource
 {
     use HasAsyncClient;
+
+    public function __construct(
+        private Config $config,
+        HttpClientInterface $httpClient,
+        ?AsyncClientInterface $asyncClient = null,
+    ) {
+        parent::__construct($httpClient, $asyncClient);
+    }
 
     /**
      * @param array<string, mixed> $filters
@@ -73,9 +87,37 @@ class Orders extends Resource
      *
      * @throws PolymarketException
      */
-    public function post(array $orderData): array
+    public function post(array $inputOrderData): array
     {
-        return $this->httpClient->post('/order', $orderData)->json();
+        $orderData = $inputOrderData['order'];
+
+        /** @var OrderSide $side */
+        $side = $orderData['side'];
+
+        // Adapt some fields to adhere to Ethereum data types
+        $orderData['side'] = $side->forSignature();
+
+        $key = $this->config->privateKey ?? throw new PolymarketException('Private key not set');
+        $signer = new Eip712Signer($key, $this->config->chainId);
+        $signature = $signer->sign(new OrderPayload($orderData));
+
+        $orderData['signature'] = $signature;
+
+        // Adapt some fields to adhere to Polymarket data types
+        $orderData['side'] = $side->forApi();
+        $orderData['feeRateBps'] = (string) $orderData['feeRateBps'];
+        $orderData['expiration'] = (string) $orderData['expiration'];
+        $orderData['nonce'] = (string) $orderData['nonce'];
+
+        $finalPayload = [
+            'order' => $orderData,
+            'owner' => $inputOrderData['owner'],
+            'orderType' =>$inputOrderData['orderType'],
+            'deferExec' => $inputOrderData['deferExec'] ?? false,
+        ];
+
+        return $this->httpClient->post('/order', $finalPayload)->json();
+
     }
 
     /**

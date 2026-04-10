@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PolymarketPhp\Polymarket\Auth\Signer;
+namespace PolymarketPhp\Polymarket\Signing;
 
 use Exception;
 use InvalidArgumentException;
@@ -12,7 +12,7 @@ use kornrunner\Secp256k1;
 use kornrunner\Signature\Signature;
 use PolymarketPhp\Polymarket\Exceptions\ClobAuthenticationException;
 use PolymarketPhp\Polymarket\Exceptions\SigningException;
-use Throwable;
+use PolymarketPhp\Polymarket\Signing\TypedData\TypedDataInterface;
 
 /**
  * EIP-712 signer for CLOB authentication.
@@ -43,33 +43,11 @@ class Eip712Signer
         }
     }
 
-    /**
-     * Sign EIP-712 typed data for CLOB authentication.
-     *
-     * @param  int  $timestamp  Unix timestamp
-     * @param  int  $nonce  Nonce value (default: 0)
-     * @return string Signature as hex string with 0x prefix
-     *
-     * @throws SigningException
-     */
-    public function signClobAuth(int $timestamp, int $nonce = 0): string
+    public function sign(TypedDataInterface $payload): string
     {
-        try {
-            $message = [
-                'address' => strtolower($this->getAddress()),
-                'timestamp' => (string) $timestamp,
-                'nonce' => $nonce,
-                'message' => 'This message attests that I control the given wallet',
-            ];
+        $hash = $this->hashTypedData($payload);
 
-            $domain = $this->buildDomain();
-            $types = $this->buildTypes();
-            $hash = $this->hashTypedData($domain, $types, $message);
-
-            return $this->signHash($hash);
-        } catch (Throwable $e) {
-            throw SigningException::eip712Failed($e->getMessage());
-        }
+        return $this->signHash($hash);
     }
 
     /**
@@ -97,61 +75,32 @@ class Eip712Signer
     }
 
     /**
-     * Build EIP-712 domain separator.
-     *
-     * @return array{name: string, version: string, chainId: int}
-     */
-    private function buildDomain(): array
-    {
-        return [
-            'name' => 'ClobAuthDomain',
-            'version' => '1',
-            'chainId' => $this->chainId,
-        ];
-    }
-
-    /**
-     * Build EIP-712 type definitions.
-     *
-     * @return array<string, array<array{name: string, type: string}>>
-     */
-    private function buildTypes(): array
-    {
-        return [
-            'ClobAuth' => [
-                ['name' => 'address', 'type' => 'address'],
-                ['name' => 'timestamp', 'type' => 'string'],
-                ['name' => 'nonce', 'type' => 'uint256'],
-                ['name' => 'message', 'type' => 'string'],
-            ],
-        ];
-    }
-
-    /**
      * Hash typed data according to EIP-712.
      *
-     * @param array{name: string, version: string, chainId: int}                     $domain
-     * @param array<string, array<array{name: string, type: string}>>                $types
-     * @param array{address: string, timestamp: string, nonce: int, message: string} $message
-     *
+     * @param TypedDataInterface $payload
+     * @return string
      * @throws Exception
      */
-    private function hashTypedData(array $domain, array $types, array $message): string
+    private function hashTypedData(TypedDataInterface $payload): string
     {
         // EIP-712 prefix
         $prefix = "\x19\x01";
 
-        // Hash domain separator
-        $domainHash = $this->hashStruct('EIP712Domain', [
-            ['name' => 'name', 'type' => 'string'],
-            ['name' => 'version', 'type' => 'string'],
-            ['name' => 'chainId', 'type' => 'uint256'],
-        ], $domain);
+        $domainHash = $this->hashStruct(
+            'EIP712Domain',
+            $payload->getDomainTypes(),
+            $payload->getDomain()
+        );
 
-        // Hash message
-        $messageHash = $this->hashStruct('ClobAuth', $types['ClobAuth'], $message);
+        $types = $payload->getTypes();
+        $primaryType = $payload->getPrimaryType();
 
-        // Concatenate and hash: keccak256("\x19\x01" ‖ domainHash ‖ messageHash)
+        $messageHash = $this->hashStruct(
+            $primaryType,
+            $types[$primaryType],
+            $payload->getMessage()
+        );
+
         $encoded = $prefix . hex2bin(substr($domainHash, 2)) . hex2bin(substr($messageHash, 2));
 
         return '0x' . Keccak::hash($encoded, 256);
@@ -172,7 +121,11 @@ class Eip712Signer
 
         $encodedValues = '';
         foreach ($types as $type) {
-            $value = $data[$type['name']];
+            $fieldName = $type['name'];
+            if (!array_key_exists($fieldName, $data)) {
+                throw new InvalidArgumentException("Missing required field '$fieldName' in $typeName data structure.");
+            }
+            $value = $data[$fieldName];
             $encodedValues .= $this->encodeValue($type['type'], $value);
         }
 
@@ -206,9 +159,9 @@ class Eip712Signer
      */
     private function encodeValue(string $type, mixed $value): string
     {
-        if ($type === 'string') {
+        if ($type === 'string' || $type === 'bytes') {
             if (!is_string($value)) {
-                throw new InvalidArgumentException("Expected string, got " . get_debug_type($value));
+                throw new InvalidArgumentException("Expected string, got " . get_debug_type($value) . ". Value: " . $value);
             }
 
             return Keccak::hash($value, 256);
@@ -218,17 +171,34 @@ class Eip712Signer
             if (!is_string($value)) {
                 throw new InvalidArgumentException("Expected string, got " . get_debug_type($value));
             }
-            $address = str_replace('0x', '', $value);
+            $address = strtolower(str_replace('0x', '', $value));
 
             return str_pad($address, 64, '0', STR_PAD_LEFT);
         }
 
-        if ($type === 'uint256') {
-            if (!is_int($value)) {
-                throw new InvalidArgumentException("Expected uint256, got " . get_debug_type($value));
+        if ($type === 'uint256' || $type === 'uint8') {
+            if (!is_int($value) && !ctype_digit($value)) {
+                throw new InvalidArgumentException("Expected uint256/uint8, got " . get_debug_type($value) . ". Value: " . $value);
             }
 
-            return str_pad(dechex($value), 64, '0', STR_PAD_LEFT);
+            $hex = gmp_strval(gmp_init($value), 16);
+
+            return str_pad($hex, 64, '0', STR_PAD_LEFT);
+        }
+
+        if ($type === 'bool') {
+            return str_pad($value ? '1' : '0', 64, '0', STR_PAD_LEFT);
+        }
+
+        if (preg_match('/^bytes(\d+)$/', $type, $matches)) {
+            $size = (int) $matches[1];
+            if ($size < 1 || $size > 32) {
+                throw new InvalidArgumentException("Invalid bytes size: $type");
+            }
+
+            $hex = str_replace('0x', '', (string) $value);
+            // Important: Fixed bytes are padded on the RIGHT
+            return str_pad($hex, 64, '0', STR_PAD_RIGHT);
         }
 
         throw new InvalidArgumentException("Unsupported type: $type");

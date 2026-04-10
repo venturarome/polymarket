@@ -10,23 +10,23 @@ use PolymarketPhp\Polymarket\Resources\Resource;
 class Server extends Resource
 {
     /**
-     * @return array<string, mixed>
+     * @return string
      *
      * @throws PolymarketException
      */
-    public function healthCheck(): array
+    public function healthCheck(): string
     {
-        return $this->httpClient->get('/')->json();
+        return $this->httpClient->get('/')->body();
     }
 
     /**
-     * @return array<string, mixed>
+     * @return int
      *
      * @throws PolymarketException
      */
-    public function getTime(): array
+    public function getTime(): int
     {
-        return $this->httpClient->get('/time')->json();
+        return (int) $this->httpClient->get('/time')->body();
     }
 
     /**
