@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PolymarketPhp\Polymarket\Resources\Clob;
 
 use GuzzleHttp\Promise\PromiseInterface;
-use PolymarketPhp\Polymarket\Config;
 use PolymarketPhp\Polymarket\Enums\OrderSide;
 use PolymarketPhp\Polymarket\Exceptions\PolymarketException;
 use PolymarketPhp\Polymarket\Http\AsyncClientInterface;
@@ -22,7 +21,7 @@ class Orders extends Resource
     use HasAsyncClient;
 
     public function __construct(
-        private Config $config,
+        private readonly ?Eip712Signer $signer,
         HttpClientInterface $httpClient,
         ?AsyncClientInterface $asyncClient = null,
     ) {
@@ -81,7 +80,13 @@ class Orders extends Resource
     }
 
     /**
-     * @param array<string, mixed> $orderData
+     * Build, sign, and submit a single order to the CLOB.
+     *
+     * The `order` sub-array must carry all twelve EIP-712 struct fields.
+     * Numeric fields (tokenId, amounts, expiration, nonce, feeRateBps, salt)
+     * may be passed as int or numeric string — both are handled transparently.
+     *
+     * @param array{order: array{maker: string, signer: string, taker: string, tokenId: string|int, makerAmount: string|int, takerAmount: string|int, expiration: int, nonce: int, feeRateBps: string|int, side: OrderSide, signatureType: int, salt: int}, owner: string, orderType: string, deferExec?: bool} $inputOrderData
      *
      * @return array<string, mixed>
      *
@@ -89,35 +94,38 @@ class Orders extends Resource
      */
     public function post(array $inputOrderData): array
     {
-        $orderData = $inputOrderData['order'];
+        $signer = $this->signer
+            ?? throw new PolymarketException(
+                'Signing requires authentication. Call Client::auth() before placing orders.'
+            );
 
-        /** @var OrderSide $side */
+        $orderData = $inputOrderData['order'];
         $side = $orderData['side'];
 
-        // Adapt some fields to adhere to Ethereum data types
+        // Convert the side enum to its integer representation for EIP-712 encoding
         $orderData['side'] = $side->forSignature();
 
-        $key = $this->config->privateKey ?? throw new PolymarketException('Private key not set');
-        $signer = new Eip712Signer($key, $this->config->chainId);
-        $signature = $signer->sign(new OrderPayload($orderData));
+        $orderData['signature'] = $signer->sign(
+            new OrderPayload($orderData, $signer->getChainId())
+        );
 
-        $orderData['signature'] = $signature;
-
-        // Adapt some fields to adhere to Polymarket data types
-        $orderData['side'] = $side->forApi();
-        $orderData['feeRateBps'] = (string) $orderData['feeRateBps'];
+        // Restore the string side value and normalise all numeric fields to
+        // strings, as required by the CLOB API.
+        $orderData['side'] = $side->value;
+        $orderData['salt'] = (string) $orderData['salt'];
+        $orderData['tokenId'] = (string) $orderData['tokenId'];
+        $orderData['makerAmount'] = (string) $orderData['makerAmount'];
+        $orderData['takerAmount'] = (string) $orderData['takerAmount'];
         $orderData['expiration'] = (string) $orderData['expiration'];
         $orderData['nonce'] = (string) $orderData['nonce'];
+        $orderData['feeRateBps'] = (string) $orderData['feeRateBps'];
 
-        $finalPayload = [
-            'order' => $orderData,
-            'owner' => $inputOrderData['owner'],
-            'orderType' =>$inputOrderData['orderType'],
+        return $this->httpClient->post('/order', [
+            'order'     => $orderData,
+            'owner'     => $inputOrderData['owner'],
+            'orderType' => $inputOrderData['orderType'],
             'deferExec' => $inputOrderData['deferExec'] ?? false,
-        ];
-
-        return $this->httpClient->post('/order', $finalPayload)->json();
-
+        ])->json();
     }
 
     /**

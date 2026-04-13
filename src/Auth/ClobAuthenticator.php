@@ -177,6 +177,14 @@ class ClobAuthenticator
     }
 
     /**
+     * Expose the underlying signer so resources can sign payloads directly.
+     */
+    public function getSigner(): Eip712Signer
+    {
+        return $this->signer;
+    }
+
+    /**
      * Create a new instance with credentials (for immutability).
      */
     public function withCredentials(ApiCredentials $credentials): self
