@@ -112,7 +112,9 @@ class ClobAuthenticator
     public function generateL1Headers(int $nonce = 0, ?int $timestamp = null): array
     {
         $timestamp ??= time();
-        $signature = $this->signer->sign(new ClobAuthPayload($this->signer->getAddress(), $timestamp, $nonce));
+        $signature = $this->signer->sign(
+            new ClobAuthPayload($this->signer->getAddress(), $timestamp, $nonce, $this->chainId)
+        );
 
         return [
             'POLY_ADDRESS' => strtolower($this->signer->getAddress()),

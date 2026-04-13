@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PolymarketPhp\Polymarket\Signing\TypedData;
 
+/**
+ * EIP-712 payload for CLOB L1 authentication.
+ */
 class ClobAuthPayload implements TypedDataInterface
 {
     /**
-     * @param string $address The wallet address
-     * @param int $timestamp Unix timestamp
-     * @param int $nonce Nonce value (usually 0)
-     * @param int $chainId Polygon Chain ID (137)
+     * @param string $address  The wallet address
+     * @param int    $timestamp Unix timestamp
+     * @param int    $nonce     Nonce value (usually 0)
+     * @param int    $chainId   Chain ID (137 for Polygon mainnet, 80002 for Amoy testnet)
      */
     public function __construct(
         private readonly string $address,
@@ -29,7 +34,7 @@ class ClobAuthPayload implements TypedDataInterface
     public function getDomainTypes(): array
     {
         return [
-            ['name' => 'name', 'type' => 'string'],
+            ['name' => 'name',    'type' => 'string'],
             ['name' => 'version', 'type' => 'string'],
             ['name' => 'chainId', 'type' => 'uint256'],
         ];
@@ -44,10 +49,10 @@ class ClobAuthPayload implements TypedDataInterface
     {
         return [
             'ClobAuth' => [
-                ['name' => 'address', 'type' => 'address'],
+                ['name' => 'address',   'type' => 'address'],
                 ['name' => 'timestamp', 'type' => 'string'],
-                ['name' => 'nonce', 'type' => 'uint256'],
-                ['name' => 'message', 'type' => 'string'],
+                ['name' => 'nonce',     'type' => 'uint256'],
+                ['name' => 'message',   'type' => 'string'],
             ],
         ];
     }
