@@ -10,8 +10,6 @@ use PolymarketPhp\Polymarket\Resources\Resource;
 class Server extends Resource
 {
     /**
-     * @return string
-     *
      * @throws PolymarketException
      */
     public function healthCheck(): string
@@ -20,8 +18,6 @@ class Server extends Resource
     }
 
     /**
-     * @return int
-     *
      * @throws PolymarketException
      */
     public function getTime(): int
