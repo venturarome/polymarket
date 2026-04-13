@@ -13,20 +13,19 @@ use kornrunner\Signature\Signature;
 use PolymarketPhp\Polymarket\Exceptions\ClobAuthenticationException;
 use PolymarketPhp\Polymarket\Exceptions\SigningException;
 use PolymarketPhp\Polymarket\Signing\TypedData\TypedDataInterface;
+use Throwable;
 
 /**
- * EIP-712 signer for CLOB authentication.
+ * EIP-712 signer. Signs typed structured data with a secp256k1 private key.
+ *
+ * Chain ID is stored here because it belongs to the signer's network context
+ * and must match the domain separator embedded in every payload.
  */
 class Eip712Signer
 {
     private readonly string $privateKey;
 
     private Address $ethAddress;
-
-    public function getAddress(): string
-    {
-        return '0x' . $this->ethAddress->get();
-    }
 
     /**
      * @throws SigningException
@@ -43,11 +42,30 @@ class Eip712Signer
         }
     }
 
+    public function getAddress(): string
+    {
+        return '0x' . $this->ethAddress->get();
+    }
+
+    public function getChainId(): int
+    {
+        return $this->chainId;
+    }
+
+    /**
+     * Sign EIP-712 typed structured data.
+     *
+     * @throws SigningException
+     */
     public function sign(TypedDataInterface $payload): string
     {
-        $hash = $this->hashTypedData($payload);
+        try {
+            $hash = $this->hashTypedData($payload);
 
-        return $this->signHash($hash);
+            return $this->signHash($hash);
+        } catch (Throwable $e) {
+            throw SigningException::eip712Failed($e->getMessage());
+        }
     }
 
     /**
@@ -77,8 +95,6 @@ class Eip712Signer
     /**
      * Hash typed data according to EIP-712.
      *
-     * @param TypedDataInterface $payload
-     * @return string
      * @throws Exception
      */
     private function hashTypedData(TypedDataInterface $payload): string
@@ -101,6 +117,7 @@ class Eip712Signer
             $payload->getMessage()
         );
 
+        // keccak256("\x19\x01" ‖ domainHash ‖ messageHash)
         $encoded = $prefix . hex2bin(substr($domainHash, 2)) . hex2bin(substr($messageHash, 2));
 
         return '0x' . Keccak::hash($encoded, 256);
@@ -112,7 +129,6 @@ class Eip712Signer
      * @param array<array{name: string, type: string}> $types
      * @param array<string, mixed>                     $data
      *
-     *
      * @throws Exception
      */
     private function hashStruct(string $typeName, array $types, array $data): string
@@ -123,13 +139,13 @@ class Eip712Signer
         foreach ($types as $type) {
             $fieldName = $type['name'];
             if (!array_key_exists($fieldName, $data)) {
-                throw new InvalidArgumentException("Missing required field '$fieldName' in $typeName data structure.");
+                throw new InvalidArgumentException(
+                    "Missing required field '{$fieldName}' in {$typeName} data structure."
+                );
             }
-            $value = $data[$fieldName];
-            $encodedValues .= $this->encodeValue($type['type'], $value);
+            $encodedValues .= $this->encodeValue($type['type'], $data[$fieldName]);
         }
 
-        // Concatenate typeHash with encoded values and hash
         $encoded = hex2bin(substr($typeHash, 2)) . hex2bin($encodedValues);
 
         return '0x' . Keccak::hash($encoded, 256);
@@ -138,30 +154,33 @@ class Eip712Signer
     /**
      * Hash a type string according to EIP-712.
      *
-     * @param  array<array{name: string, type: string}>  $types
+     * @param array<array{name: string, type: string}> $types
      *
      * @throws Exception
      */
     private function hashType(string $typeName, array $types): string
     {
-        $typeString = $typeName . '(';
         $parts = [];
         foreach ($types as $type) {
             $parts[] = $type['type'] . ' ' . $type['name'];
         }
-        $typeString .= implode(',', $parts) . ')';
 
-        return '0x' . Keccak::hash($typeString, 256);
+        return '0x' . Keccak::hash($typeName . '(' . implode(',', $parts) . ')', 256);
     }
 
     /**
      * Encode a value according to EIP-712 encoding rules.
+     *
+     * @throws InvalidArgumentException
      */
     private function encodeValue(string $type, mixed $value): string
     {
+        // Dynamic types: keccak256 of the raw bytes
         if ($type === 'string' || $type === 'bytes') {
             if (!is_string($value)) {
-                throw new InvalidArgumentException("Expected string, got " . get_debug_type($value) . ". Value: " . $value);
+                throw new InvalidArgumentException(
+                    "Expected string for type '{$type}', got " . get_debug_type($value)
+                );
             }
 
             return Keccak::hash($value, 256);
@@ -169,43 +188,53 @@ class Eip712Signer
 
         if ($type === 'address') {
             if (!is_string($value)) {
-                throw new InvalidArgumentException("Expected string, got " . get_debug_type($value));
+                throw new InvalidArgumentException(
+                    "Expected string for type 'address', got " . get_debug_type($value)
+                );
             }
-            $address = strtolower(str_replace('0x', '', $value));
 
-            return str_pad($address, 64, '0', STR_PAD_LEFT);
+            return str_pad(strtolower(str_replace('0x', '', $value)), 64, '0', STR_PAD_LEFT);
         }
 
         if ($type === 'uint256' || $type === 'uint8') {
-            if (!is_int($value) && !ctype_digit($value)) {
-                throw new InvalidArgumentException("Expected uint256/uint8, got " . get_debug_type($value) . ". Value: " . $value);
+            if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
+                throw new InvalidArgumentException(
+                    "Expected integer or numeric string for type '{$type}', got "
+                    . get_debug_type($value)
+                );
             }
 
-            $hex = gmp_strval(gmp_init($value), 16);
-
-            return str_pad($hex, 64, '0', STR_PAD_LEFT);
+            // PHPStan now knows $value is int|string
+            return str_pad(gmp_strval(gmp_init($value), 16), 64, '0', STR_PAD_LEFT);
         }
 
         if ($type === 'bool') {
             return str_pad($value ? '1' : '0', 64, '0', STR_PAD_LEFT);
         }
 
+        // Fixed-size bytes (bytes1..bytes32): right-padded per EIP-712 spec
         if (preg_match('/^bytes(\d+)$/', $type, $matches)) {
             $size = (int) $matches[1];
             if ($size < 1 || $size > 32) {
-                throw new InvalidArgumentException("Invalid bytes size: $type");
+                throw new InvalidArgumentException("Invalid fixed bytes type: '{$type}'");
             }
 
-            $hex = str_replace('0x', '', (string) $value);
-            // Important: Fixed bytes are padded on the RIGHT
-            return str_pad($hex, 64, '0', STR_PAD_RIGHT);
+            if (!is_string($value)) {
+                throw new InvalidArgumentException(
+                    "Expected hex string for type '{$type}', got " . get_debug_type($value)
+                );
+            }
+
+            return str_pad(str_replace('0x', '', $value), 64, '0', STR_PAD_RIGHT);
         }
 
-        throw new InvalidArgumentException("Unsupported type: $type");
+        throw new InvalidArgumentException("Unsupported EIP-712 type: '{$type}'");
     }
 
     /**
-     * @param  string  $hash  Hash to sign (with 0x prefix)
+     * Sign a 32-byte hash and return an Ethereum-style (r ‖ s ‖ v) hex signature.
+     *
+     * @param string $hash Hash to sign (with 0x prefix)
      */
     private function signHash(string $hash): string
     {
@@ -216,7 +245,6 @@ class Eip712Signer
         /** @var Signature $signature */
         $signature = $secp256k1->sign($hashHex, $privateKeyHex);
 
-        // Ethereum signature (r + s + v)
         $r = str_pad(gmp_strval($signature->getR(), 16), 64, '0', STR_PAD_LEFT);
         $s = str_pad(gmp_strval($signature->getS(), 16), 64, '0', STR_PAD_LEFT);
         $v = 27 + $signature->getRecoveryParam();
